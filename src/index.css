@@ -1,1 +1,93 @@
 @import "tailwindcss";
+
+@theme {
+  --font-head: "Archivo Black", sans-serif;
+  --font-sans: "Space Grotesk", sans-serif;
+  --shadow-xs: 1px 1px 0 0 var(--border);
+  --shadow-sm: 2px 2px 0 0 var(--border);
+  --shadow: 3px 3px 0 0 var(--border);
+  --shadow-md: 4px 4px 0 0 var(--border);
+  --shadow-lg: 6px 6px 0 0 var(--border);
+  --shadow-xl: 10px 10px 0 1px var(--border);
+  --shadow-2xl: 16px 16px 0 1px var(--border);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+}
+
+:root {
+  --radius: 0.5rem;
+  --background: #f9f5f2;
+  --foreground: #000000;
+  --muted: #efd0d5;
+  --muted-foreground: #a42439;
+  --card: #ffffff;
+  --card-foreground: #000000;
+  --popover: #ffffff;
+  --popover-foreground: #000000;
+  --border: #000000;
+  --input: #ffffff;
+  --primary: #ea435f;
+  --primary-hover: #d00000;
+  --primary-foreground: #ffffff;
+  --secondary: #ffda5c;
+  --secondary-foreground: #000000;
+  --accent: #ceebfc;
+  --accent-foreground: #000000;
+  --destructive: #d00000;
+  --destructive-foreground: #ffffff;
+  --ring: #000000;
+}
+
+.dark {
+  --background: #12100e;
+  --foreground: #f5f5f5;
+  --muted: #3a2617;
+  --muted-foreground: #ffb679;
+  --card: #1a1a1a;
+  --card-foreground: #ffffff;
+  --popover: #1a1a1a;
+  --popover-foreground: #ffffff;
+  --border: #2a2a2a;
+  --input: #2a2a2a;
+  --primary: #f07200;
+  --primary-hover: #ff8011;
+  --primary-foreground: #fdead9;
+  --secondary: #ef8c27;
+  --secondary-foreground: #000000;
+  --accent: #ff6b6b;
+  --accent-foreground: #000000;
+  --destructive: #fe3b3b;
+  --destructive-foreground: #ffffff;
+  --ring: #f07200;
+}
+
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: "Space Grotesk", sans-serif;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Archivo Black", sans-serif;
+  }
+}
