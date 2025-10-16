@@ -55,5 +55,5 @@ export interface AnalysisResponse {
 export interface APIError {
   message: string;
   status: number;
-  data?: any;
+  data?: unknown;
 }
