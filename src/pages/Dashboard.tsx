@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/retroui/Button';
-import { Card } from '@/components/retroui/Card';
 
 export const Dashboard = () => {
   const navigate = useNavigate();
@@ -22,26 +21,32 @@ export const Dashboard = () => {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <Card>
-            <Card.Header>
-              <Card.Title>New Analysis</Card.Title>
-              <Card.Description>
+          <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden">
+            {/* Colored Header Section */}
+            <div className="bg-gradient-to-br from-primary to-primary-hover p-6">
+              <h3 className="text-xl font-bold text-foreground">New Analysis</h3>
+              <p className="text-foreground/80 text-sm mt-1">
                 Upload your resume and compare it with a job description
-              </Card.Description>
-            </Card.Header>
-            <Card.Content>
+              </p>
+            </div>
+
+            {/* White Content Section */}
+            <div className="p-6 bg-white">
               <Button onClick={() => navigate('/')} className="w-full">
                 Start New Analysis
               </Button>
-            </Card.Content>
-          </Card>
+            </div>
+          </div>
 
-          <Card>
-            <Card.Header>
-              <Card.Title>Account Info</Card.Title>
-              <Card.Description>Your account details</Card.Description>
-            </Card.Header>
-            <Card.Content className="space-y-2">
+          <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden">
+            {/* Colored Header Section */}
+            <div className="bg-gradient-to-br from-primary to-primary-hover p-6">
+              <h3 className="text-xl font-bold text-foreground">Account Info</h3>
+              <p className="text-foreground/80 text-sm mt-1">Your account details</p>
+            </div>
+
+            {/* White Content Section */}
+            <div className="p-6 bg-white space-y-2">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Email</p>
                 <p className="text-foreground">{user?.email}</p>
@@ -58,25 +63,28 @@ export const Dashboard = () => {
                   {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
                 </p>
               </div>
-            </Card.Content>
-          </Card>
+            </div>
+          </div>
         </div>
 
         {/* Past Analyses Section (Placeholder) */}
-        <Card>
-          <Card.Header>
-            <Card.Title>Recent Analyses</Card.Title>
-            <Card.Description>Your previous resume analyses</Card.Description>
-          </Card.Header>
-          <Card.Content>
+        <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden">
+          {/* Colored Header Section */}
+          <div className="bg-gradient-to-br from-primary to-primary-hover p-6">
+            <h3 className="text-xl font-bold text-foreground">Recent Analyses</h3>
+            <p className="text-foreground/80 text-sm mt-1">Your previous resume analyses</p>
+          </div>
+
+          {/* White Content Section */}
+          <div className="p-6 bg-white">
             <div className="text-center py-8 text-muted-foreground">
               <p className="mb-4">No analyses yet</p>
               <Button variant="outline" onClick={() => navigate('/')}>
                 Create your first analysis
               </Button>
             </div>
-          </Card.Content>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
