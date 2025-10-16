@@ -5,8 +5,8 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/retroui/Button';
-import { Card } from '@/components/retroui/Card';
 import { Input } from '@/components/retroui/Input';
+import { PasswordInput } from '@/components/retroui/PasswordInput';
 import { Label } from '@/components/retroui/Label';
 
 const signUpSchema = z
@@ -47,15 +47,20 @@ export const SignUp = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
-        <Card.Header className="space-y-1">
-          <Card.Title className="text-2xl font-bold text-center">Sign Up</Card.Title>
-          <Card.Description className="text-center">
+      <div className="w-full max-w-md border-2 border-black bg-white shadow-xl rounded overflow-hidden">
+        {/* Colored Header Section */}
+        <div className="bg-gradient-to-br from-primary to-primary-hover p-8">
+          <h2 className="text-3xl font-bold text-foreground mb-2 text-center">
+            Sign Up
+          </h2>
+          <p className="text-foreground/80 text-lg text-center">
             Create an account to get started
-          </Card.Description>
-        </Card.Header>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Card.Content className="space-y-4">
+          </p>
+        </div>
+
+        {/* White Content Section */}
+        <div className="p-8 bg-white">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="fullName">Full Name (Optional)</Label>
               <Input
@@ -86,9 +91,8 @@ export const SignUp = () => {
 
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 placeholder="••••••••"
                 {...register('password')}
                 disabled={isLoading}
@@ -100,9 +104,8 @@ export const SignUp = () => {
 
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input
+              <PasswordInput
                 id="confirmPassword"
-                type="password"
                 placeholder="••••••••"
                 {...register('confirmPassword')}
                 disabled={isLoading}
@@ -111,20 +114,20 @@ export const SignUp = () => {
                 <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
               )}
             </div>
-          </Card.Content>
-          <Card.Footer className="flex flex-col space-y-4">
+
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? 'Creating account...' : 'Sign Up'}
             </Button>
+
             <p className="text-sm text-center text-muted-foreground">
               Already have an account?{' '}
               <Link to="/signin" className="text-primary hover:underline">
                 Sign In
               </Link>
             </p>
-          </Card.Footer>
-        </form>
-      </Card>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };
