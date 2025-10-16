@@ -15,7 +15,6 @@ import {
 } from "@/schemas/analysis.schema";
 import { useAnalyzeResume } from "@/hooks/useAnalyzeResume";
 import { Button } from "@/components/retroui/Button";
-import { Card } from "@/components/retroui/Card";
 import { Label } from "@/components/retroui/Label";
 import { Input } from "@/components/retroui/Input";
 import { Textarea } from "@/components/retroui/Textarea";
@@ -91,111 +90,118 @@ export default function Home() {
       {/* Main Content */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="max-w-3xl mx-auto">
-        {!result ? (
-          /* Analysis Form */
-          <Card>
-            <Card.Header>
-              <Card.Title className="text-2xl">
-                Quick Resume Analysis
-              </Card.Title>
-              <Card.Description>
-                Upload your resume and paste a job description to get instant
-                AI-powered feedback
-              </Card.Description>
-            </Card.Header>
-            <Card.Content>
-              {/* Error Display */}
-              {error && (
-                <Alert status="error" className="mb-6">
-                  <XCircle className="h-4 w-4" />
-                  <Alert.Description>{error.message}</Alert.Description>
-                </Alert>
-              )}
+          {!result ? (
+            /* Analysis Form */
+            <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden">
+              {/* Colored Header Section */}
+              <div className="bg-gradient-to-br from-primary to-primary-hover p-8">
+                <h2 className="text-3xl font-bold text-foreground mb-2">
+                  Quick Resume Analysis
+                </h2>
+                <p className="text-foreground/80 text-lg">
+                  Upload your resume and paste a job description to get instant
+                  AI-powered feedback
+                </p>
+              </div>
 
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                {/* File Upload */}
-                <div>
-                  <Label htmlFor="resume" className="mb-2">
-                    Upload Resume (PDF or DOCX)
-                  </Label>
-                  <div className="border-2 border-dashed border-border rounded p-8 text-center hover:border-primary transition-all hover:shadow-md bg-card">
-                    <Input
-                      id="resume"
-                      type="file"
-                      accept=".pdf,.docx"
-                      className="hidden"
-                      {...register("resume")}
-                    />
-                    <label htmlFor="resume" className="cursor-pointer">
-                      {selectedFileName ? (
-                        <div className="text-primary">
-                          <FileText className="mx-auto h-12 w-12 mb-2" />
-                          <p className="font-medium">{selectedFileName}</p>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            Click to change file
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="text-muted-foreground">
-                          <Upload className="mx-auto h-12 w-12 mb-2" />
-                          <p className="font-medium text-foreground">
-                            Drop your resume here or click to browse
-                          </p>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            PDF or DOCX up to 5MB
-                          </p>
-                        </div>
-                      )}
-                    </label>
+              {/* White Content Section */}
+              <div className="p-8 bg-white">
+                {/* Error Display */}
+                {error && (
+                  <Alert status="error" className="mb-6">
+                    <XCircle className="h-4 w-4" />
+                    <Alert.Description>{error.message}</Alert.Description>
+                  </Alert>
+                )}
+
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                  {/* File Upload */}
+                  <div>
+                    <Label htmlFor="resume" className="mb-2">
+                      Upload Resume (PDF or DOCX)
+                    </Label>
+                    <div className="border-2 border-black rounded p-8 text-center bg-background hover:border-primary transition-all shadow-md hover:shadow-lg cursor-pointer">
+                      <Input
+                        id="resume"
+                        type="file"
+                        accept=".pdf,.docx"
+                        className="hidden"
+                        {...register("resume")}
+                      />
+                      <label htmlFor="resume" className="cursor-pointer">
+                        {selectedFileName ? (
+                          <div className="text-primary">
+                            <FileText className="mx-auto h-12 w-12 mb-2" />
+                            <p className="font-medium">{selectedFileName}</p>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              Click to change file
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="text-muted-foreground">
+                            <Upload className="mx-auto h-12 w-12 mb-2" />
+                            <p className="font-medium text-foreground">
+                              Drop your resume here or click to browse
+                            </p>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              PDF or DOCX up to 5MB
+                            </p>
+                          </div>
+                        )}
+                      </label>
+                    </div>
+                    {errors.resume && (
+                      <p className="text-sm text-destructive mt-1">
+                        {errors.resume.message as string}
+                      </p>
+                    )}
                   </div>
-                  {errors.resume && (
-                    <p className="text-sm text-destructive mt-1">
-                      {errors.resume.message as string}
-                    </p>
-                  )}
-                </div>
 
-                {/* Job Description */}
-                <div>
-                  <Label htmlFor="jobDescription" className="mb-2">
-                    Job Description
-                  </Label>
-                  <Textarea
-                    id="jobDescription"
-                    rows={8}
-                    placeholder="Paste the job description here..."
-                    {...register("jobDescription")}
-                    className="resize-none"
-                  />
-                  {errors.jobDescription && (
-                    <p className="text-sm text-destructive mt-1">
-                      {errors.jobDescription.message}
-                    </p>
-                  )}
-                </div>
+                  {/* Job Description */}
+                  <div>
+                    <Label htmlFor="jobDescription" className="mb-2">
+                      Job Description
+                    </Label>
+                    <Textarea
+                      id="jobDescription"
+                      rows={8}
+                      placeholder="Paste the job description here..."
+                      {...register("jobDescription")}
+                      className="resize-none"
+                    />
+                    {errors.jobDescription && (
+                      <p className="text-sm text-destructive mt-1">
+                        {errors.jobDescription.message}
+                      </p>
+                    )}
+                  </div>
 
-                {/* Submit Button */}
-                <Button type="submit" disabled={isPending} className="w-full">
-                  {isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Analyzing...
-                    </>
-                  ) : (
-                    "Analyze Resume"
-                  )}
-                </Button>
-              </form>
-            </Card.Content>
-          </Card>
-        ) : (
-          /* Results */
-          <div className="space-y-6">
-            <Card>
-              <Card.Header>
-                <Card.Title className="text-2xl">Analysis Results</Card.Title>
-              </Card.Header>
-              <Card.Content className="space-y-8">
+                  {/* Submit Button */}
+                  <Button type="submit" disabled={isPending} className="w-full">
+                    {isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Analyzing...
+                      </>
+                    ) : (
+                      "Analyze Resume"
+                    )}
+                  </Button>
+                </form>
+              </div>
+            </div>
+          ) : (
+            /* Results */
+            <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden">
+              {/* Colored Header Section */}
+              <div className="bg-gradient-to-br from-primary to-primary-hover p-8">
+                <h2 className="text-3xl font-bold text-foreground">
+                  Analysis Results
+                </h2>
+              </div>
+
+              {/* White Content Section */}
+              <div className="p-8 bg-white space-y-8">
                 {/* Match Score */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
@@ -285,10 +291,9 @@ export default function Home() {
                 >
                   Analyze Another Resume
                 </Button>
-              </Card.Content>
-            </Card>
-          </div>
-        )}
+              </div>
+            </div>
+          )}
         </div>
       </section>
     </>

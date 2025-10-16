@@ -14,14 +14,14 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-white border-b-5 border-black sticky top-0 z-50">
+    <header className="bg-white border-b-5 border-black sticky top-0 z-50 shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
             <button
               onClick={() => navigate(isAuthenticated ? "/dashboard" : "/")}
-              className="font-display text-2xl font-extrabold text-primary-600 hover:text-primary-700 transition-colors"
+              className="font-display text-2xl font-extrabold text-primary hover:text-primary-hover transition-colors"
             >
               ResumeMatch AI
             </button>
