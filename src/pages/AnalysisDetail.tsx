@@ -7,13 +7,23 @@ import {
   Calendar,
   Briefcase,
   Building2,
+  Target,
+  FileCheck,
+  Brain,
+  Lightbulb,
+  Sparkles,
+  FileText,
 } from "lucide-react";
 import { Button } from "@/components/retroui/Button";
-import { Progress } from "@/components/retroui/Progress";
 import { Badge } from "@/components/retroui/Badge";
 import { Alert } from "@/components/retroui/Alert";
 import { useAnalysisById } from "@/hooks/useAnalysisHistory";
 import type { AISuggestion, RewrittenBullet, ATSIssue } from "@/types/api";
+import { ScoreCard } from "@/components/analysis/ScoreCard";
+import { CollapsibleSection } from "@/components/analysis/CollapsibleSection";
+import { CopyButton } from "@/components/analysis/CopyButton";
+import { KeywordMatchBar } from "@/components/analysis/KeywordMatchBar";
+import { formatAsList } from "@/lib/copyToClipboard";
 
 export const AnalysisDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -118,114 +128,128 @@ export const AnalysisDetail = () => {
           <div className="p-8 bg-white space-y-8">
             {/* Scores Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center p-6 border-2 border-black rounded shadow-md bg-gradient-to-br from-green-50 to-green-100">
-                <p className="text-sm font-medium text-muted-foreground mb-2">
-                  Match Score
-                </p>
-                <p className="text-4xl font-bold text-green-600">
-                  {Number(analysis.match_score)?.toFixed(0) || 0}%
-                </p>
-                <Progress
-                  value={Number(analysis.match_score) || 0}
-                  className="h-3 mt-4"
-                />
-              </div>
-
-              <div className="text-center p-6 border-2 border-black rounded shadow-md bg-gradient-to-br from-blue-50 to-blue-100">
-                <p className="text-sm font-medium text-muted-foreground mb-2">
-                  ATS Score
-                </p>
-                <p className="text-4xl font-bold text-blue-600">
-                  {Number(analysis.ats_score)?.toFixed(0) || 0}%
-                </p>
-                <Progress
-                  value={Number(analysis.ats_score) || 0}
-                  className="h-3 mt-4"
-                />
-              </div>
-
-              <div className="text-center p-6 border-2 border-black rounded shadow-md bg-gradient-to-br from-purple-50 to-purple-100">
-                <p className="text-sm font-medium text-muted-foreground mb-2">
-                  Semantic Similarity
-                </p>
-                <p className="text-4xl font-bold text-purple-600">
-                  {Number(analysis.semantic_similarity)?.toFixed(0) || 0}%
-                </p>
-                <Progress
-                  value={Number(analysis.semantic_similarity) || 0}
-                  className="h-3 mt-4"
-                />
-              </div>
+              <ScoreCard
+                title="Match Score"
+                score={Number(analysis.match_score) || 0}
+                type="match"
+                icon={<Target className="h-6 w-6 text-green-600" />}
+                description="How well your resume matches the job description based on keywords and requirements"
+              />
+              <ScoreCard
+                title="ATS Score"
+                score={Number(analysis.ats_score) || 0}
+                type="ats"
+                icon={<FileCheck className="h-6 w-6 text-blue-600" />}
+                description="Applicant Tracking System compatibility - higher scores mean better chances of passing automated screening"
+              />
+              <ScoreCard
+                title="Semantic Similarity"
+                score={Number(analysis.semantic_similarity) || 0}
+                type="semantic"
+                icon={<Brain className="h-6 w-6 text-purple-600" />}
+                description="How semantically similar your experience is to the job requirements, beyond just keyword matching"
+              />
             </div>
 
             {/* Keywords */}
-            <div>
-              <h3 className="text-xl font-semibold text-foreground mb-4">
-                Keywords Analysis
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="border-2 border-black rounded p-4 shadow-md">
-                  <div className="flex items-center gap-2 mb-3">
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                    <h4 className="font-medium text-green-700">
-                      Matched Keywords (
-                      {analysis.matching_keywords?.length || 0})
-                    </h4>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {analysis.matching_keywords?.length ? (
-                      analysis.matching_keywords.map((keyword, index) => (
-                        <Badge
-                          key={index}
-                          variant="solid"
-                          className="bg-green-600 text-white border-2 border-black"
-                        >
-                          {keyword}
-                        </Badge>
-                      ))
-                    ) : (
-                      <p className="text-sm text-muted-foreground">
-                        No matching keywords found
-                      </p>
-                    )}
-                  </div>
-                </div>
+            <CollapsibleSection
+              title="Keywords Analysis"
+              icon={<Sparkles className="h-5 w-5 text-primary" />}
+              defaultOpen={true}
+            >
+              <div className="space-y-6">
+                {/* Keyword Match Bar */}
+                <KeywordMatchBar
+                  matchedCount={analysis.matching_keywords?.length || 0}
+                  totalCount={
+                    (analysis.matching_keywords?.length || 0) +
+                    (analysis.missing_keywords?.length || 0)
+                  }
+                />
 
-                <div className="border-2 border-black rounded p-4 shadow-md">
-                  <div className="flex items-center gap-2 mb-3">
-                    <XCircle className="h-5 w-5 text-red-600" />
-                    <h4 className="font-medium text-red-700">
-                      Missing Keywords ({analysis.missing_keywords?.length || 0}
-                      )
-                    </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="border-2 border-black rounded p-4 shadow-md">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-5 w-5 text-green-600" />
+                        <h4 className="font-medium text-green-700">
+                          Matched Keywords (
+                          {analysis.matching_keywords?.length || 0})
+                        </h4>
+                      </div>
+                      {analysis.matching_keywords?.length > 0 && (
+                        <CopyButton
+                          text={formatAsList(analysis.matching_keywords)}
+                          label="Copy"
+                          size="sm"
+                        />
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {analysis.matching_keywords?.length ? (
+                        analysis.matching_keywords.map((keyword, index) => (
+                          <Badge
+                            key={index}
+                            variant="solid"
+                            className="bg-green-600 text-white border-2 border-black"
+                          >
+                            {keyword}
+                          </Badge>
+                        ))
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          No matching keywords found
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {analysis.missing_keywords?.length ? (
-                      analysis.missing_keywords.map((keyword, index) => (
-                        <Badge
-                          key={index}
-                          variant="solid"
-                          className="bg-red-600 text-white border-2 border-black"
-                        >
-                          {keyword}
-                        </Badge>
-                      ))
-                    ) : (
-                      <p className="text-sm text-muted-foreground">
-                        No missing keywords
-                      </p>
-                    )}
+
+                  <div className="border-2 border-black rounded p-4 shadow-md">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <XCircle className="h-5 w-5 text-red-600" />
+                        <h4 className="font-medium text-red-700">
+                          Missing Keywords ({analysis.missing_keywords?.length || 0}
+                          )
+                        </h4>
+                      </div>
+                      {analysis.missing_keywords?.length > 0 && (
+                        <CopyButton
+                          text={formatAsList(analysis.missing_keywords)}
+                          label="Copy"
+                          size="sm"
+                        />
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {analysis.missing_keywords?.length ? (
+                        analysis.missing_keywords.map((keyword, index) => (
+                          <Badge
+                            key={index}
+                            variant="solid"
+                            className="bg-red-600 text-white border-2 border-black"
+                          >
+                            {keyword}
+                          </Badge>
+                        ))
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          No missing keywords
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </CollapsibleSection>
 
             {/* ATS Issues */}
             {analysis.ats_issues && analysis.ats_issues.length > 0 && (
-              <div>
-                <h3 className="text-xl font-semibold text-foreground mb-4">
-                  ATS Compatibility Issues
-                </h3>
+              <CollapsibleSection
+                title={`ATS Compatibility Issues (${analysis.ats_issues.length})`}
+                icon={<AlertCircle className="h-5 w-5 text-yellow-600" />}
+                defaultOpen={true}
+              >
                 <div className="border-2 border-black rounded p-4 shadow-md bg-yellow-50">
                   <ul className="space-y-3">
                     {analysis.ats_issues.map((issue: ATSIssue, index: number) => (
@@ -245,15 +269,16 @@ export const AnalysisDetail = () => {
                     ))}
                   </ul>
                 </div>
-              </div>
+              </CollapsibleSection>
             )}
 
             {/* AI Suggestions */}
             {analysis.ai_suggestions && analysis.ai_suggestions.length > 0 && (
-              <div>
-                <h3 className="text-xl font-semibold text-foreground mb-4">
-                  AI-Powered Suggestions
-                </h3>
+              <CollapsibleSection
+                title={`AI-Powered Suggestions (${analysis.ai_suggestions.length})`}
+                icon={<Lightbulb className="h-5 w-5 text-blue-600" />}
+                defaultOpen={true}
+              >
                 <div className="space-y-4">
                   {analysis.ai_suggestions.map(
                     (suggestion: AISuggestion, index: number) => (
@@ -300,16 +325,17 @@ export const AnalysisDetail = () => {
                     )
                   )}
                 </div>
-              </div>
+              </CollapsibleSection>
             )}
 
             {/* Rewritten Bullets */}
             {analysis.rewritten_bullets &&
               analysis.rewritten_bullets.length > 0 && (
-                <div>
-                  <h3 className="text-xl font-semibold text-foreground mb-4">
-                    AI-Improved Bullet Points
-                  </h3>
+                <CollapsibleSection
+                  title={`AI-Improved Bullet Points (${analysis.rewritten_bullets.length})`}
+                  icon={<Sparkles className="h-5 w-5 text-green-600" />}
+                  defaultOpen={true}
+                >
                   <div className="space-y-4">
                     {analysis.rewritten_bullets.map(
                       (bullet: RewrittenBullet, index: number) => (
@@ -317,6 +343,14 @@ export const AnalysisDetail = () => {
                           key={index}
                           className="border-2 border-black rounded p-4 shadow-md"
                         >
+                          <div className="flex justify-end mb-2">
+                            <CopyButton
+                              text={bullet.improved}
+                              label="Copy Improved"
+                              size="sm"
+                              variant="ghost"
+                            />
+                          </div>
                           <div className="mb-3">
                             <p className="text-xs font-medium text-muted-foreground mb-1">
                               Original:
@@ -342,20 +376,21 @@ export const AnalysisDetail = () => {
                       )
                     )}
                   </div>
-                </div>
+                </CollapsibleSection>
               )}
 
             {/* Job Description */}
-            <div>
-              <h3 className="text-xl font-semibold text-foreground mb-4">
-                Job Description
-              </h3>
+            <CollapsibleSection
+              title="Job Description"
+              icon={<FileText className="h-5 w-5 text-gray-600" />}
+              defaultOpen={false}
+            >
               <div className="border-2 border-black rounded p-4 shadow-md bg-gray-50">
                 <p className="text-sm text-foreground whitespace-pre-wrap">
                   {analysis.job_description}
                 </p>
               </div>
-            </div>
+            </CollapsibleSection>
 
             {/* Processing Time */}
             <div className="text-sm text-muted-foreground border-t pt-4">
