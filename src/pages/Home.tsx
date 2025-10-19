@@ -64,6 +64,8 @@ export default function Home() {
   const { mutate: analyzeResume, isPending, error } = useAnalyzeResume();
 
   const resumeFiles = watch("resume");
+  const jobDescription = watch("jobDescription");
+  const jobDescriptionLength = jobDescription?.length || 0;
 
   // Handle pre-selected resume from navigation
   useEffect(() => {
@@ -83,6 +85,13 @@ export default function Home() {
   ) {
     setSelectedFileName(resumeFiles[0].name);
   }
+
+  // Helper to format file size
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
 
   const onSubmit = (data: AnalysisFormData) => {
     const analysisRequest = {
@@ -220,9 +229,11 @@ export default function Home() {
                   {uploadMode === "upload" && (
                     <div>
                       <Label htmlFor="resume" className="mb-2">
-                        Upload Resume (PDF or DOCX)
+                        Upload Resume
                       </Label>
-                      <div className="border-2 border-black rounded p-8 text-center bg-background hover:border-primary transition-all shadow-md hover:shadow-lg cursor-pointer">
+                      <div className={`border-2 rounded p-8 text-center bg-background transition-all shadow-md cursor-pointer ${
+                        errors.resume ? 'border-red-500 hover:border-red-600' : 'border-black hover:border-primary hover:shadow-lg'
+                      }`}>
                         <Input
                           id="resume"
                           type="file"
@@ -231,12 +242,12 @@ export default function Home() {
                           {...register("resume")}
                         />
                         <label htmlFor="resume" className="cursor-pointer">
-                          {selectedFileName ? (
+                          {selectedFileName && resumeFiles?.[0] ? (
                             <div className="text-primary">
                               <FileText className="mx-auto h-12 w-12 mb-2" />
                               <p className="font-medium">{selectedFileName}</p>
                               <p className="text-sm text-muted-foreground mt-1">
-                                Click to change file
+                                {formatFileSize(resumeFiles[0].size)} • Click to change file
                               </p>
                             </div>
                           ) : (
@@ -246,15 +257,22 @@ export default function Home() {
                                 Drop your resume here or click to browse
                               </p>
                               <p className="text-sm text-muted-foreground mt-1">
-                                PDF or DOCX up to 5MB
+                                PDF or DOCX • Maximum 5MB
                               </p>
                             </div>
                           )}
                         </label>
                       </div>
                       {errors.resume && (
-                        <p className="text-sm text-destructive mt-1">
-                          {errors.resume.message as string}
+                        <p className="text-sm text-destructive mt-2 flex items-start gap-1">
+                          <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                          <span>{errors.resume.message as string}</span>
+                        </p>
+                      )}
+                      {!errors.resume && resumeFiles?.[0] && (
+                        <p className="text-sm text-green-600 mt-2 flex items-center gap-1">
+                          <CheckCircle className="h-4 w-4" />
+                          <span>File ready for upload</span>
                         </p>
                       )}
                     </div>
@@ -278,19 +296,44 @@ export default function Home() {
 
                   {/* Job Description */}
                   <div>
-                    <Label htmlFor="jobDescription" className="mb-2">
-                      Job Description
-                    </Label>
+                    <div className="flex items-center justify-between mb-2">
+                      <Label htmlFor="jobDescription">
+                        Job Description
+                      </Label>
+                      <span className={`text-xs ${
+                        jobDescriptionLength < 50
+                          ? 'text-red-600 font-medium'
+                          : jobDescriptionLength > 10000
+                          ? 'text-red-600 font-medium'
+                          : jobDescriptionLength > 9000
+                          ? 'text-yellow-600'
+                          : 'text-muted-foreground'
+                      }`}>
+                        {jobDescriptionLength.toLocaleString()} / 10,000
+                        {jobDescriptionLength < 50 && jobDescriptionLength > 0 && (
+                          <span className="ml-1">({50 - jobDescriptionLength} more needed)</span>
+                        )}
+                      </span>
+                    </div>
                     <Textarea
                       id="jobDescription"
                       rows={8}
-                      placeholder="Paste the job description here..."
+                      placeholder="Paste the job description here... (minimum 50 characters)"
                       {...register("jobDescription")}
-                      className="resize-none"
+                      className={`resize-none ${
+                        errors.jobDescription ? 'border-red-500 focus:border-red-600' : ''
+                      }`}
                     />
                     {errors.jobDescription && (
-                      <p className="text-sm text-destructive mt-1">
-                        {errors.jobDescription.message}
+                      <p className="text-sm text-destructive mt-2 flex items-start gap-1">
+                        <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                        <span>{errors.jobDescription.message}</span>
+                      </p>
+                    )}
+                    {!errors.jobDescription && jobDescriptionLength >= 50 && jobDescriptionLength <= 10000 && (
+                      <p className="text-sm text-green-600 mt-2 flex items-center gap-1">
+                        <CheckCircle className="h-4 w-4" />
+                        <span>Job description looks good</span>
                       </p>
                     )}
                   </div>
@@ -307,6 +350,9 @@ export default function Home() {
                       placeholder="e.g., Senior Software Engineer"
                       {...register("jobTitle")}
                     />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Helps organize your analysis history
+                    </p>
                   </div>
 
                   {/* Optional: Company Name */}
@@ -321,6 +367,9 @@ export default function Home() {
                       placeholder="e.g., Tech Corp Inc."
                       {...register("companyName")}
                     />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Makes it easier to track applications
+                    </p>
                   </div>
 
                   {/* Submit Button */}

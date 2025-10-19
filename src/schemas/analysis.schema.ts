@@ -6,6 +6,13 @@ const ACCEPTED_FILE_TYPES = [
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 ];
 
+// Helper function to format bytes to human-readable size
+const formatBytes = (bytes: number): string => {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
 export const analysisFormSchema = z
   .object({
     resume: z
@@ -19,8 +26,15 @@ export const analysisFormSchema = z
           }
           return true;
         },
-        {
-          message: 'File size must be less than 5MB',
+        (files) => {
+          if (files && files.length > 0 && files[0]) {
+            const actualSize = formatBytes(files[0].size);
+            const maxSize = formatBytes(MAX_FILE_SIZE);
+            return {
+              message: `File too large (${actualSize}). Maximum allowed size is ${maxSize}.`,
+            };
+          }
+          return { message: 'File size must be less than 5MB' };
         }
       )
       .refine(
@@ -32,14 +46,18 @@ export const analysisFormSchema = z
           return true;
         },
         {
-          message: 'Only PDF and DOCX files are accepted',
+          message: 'Invalid file format. Please upload a PDF (.pdf) or Word document (.docx).',
         }
       ),
     resumeId: z.string().optional(),
     jobDescription: z
       .string()
-      .min(50, { message: 'Job description must be at least 50 characters' })
-      .max(10000, { message: 'Job description is too long (max 10,000 characters)' }),
+      .min(50, {
+        message: 'Job description is too short. Please provide at least 50 characters for accurate analysis.'
+      })
+      .max(10000, {
+        message: 'Job description is too long. Please keep it under 10,000 characters.'
+      }),
     jobTitle: z.string().optional(),
     companyName: z.string().optional(),
   })
@@ -51,7 +69,7 @@ export const analysisFormSchema = z
       return hasFile || hasResumeId;
     },
     {
-      message: 'Please either upload a resume file or select one from your library',
+      message: 'Please upload a resume file or select one from your library to continue.',
       path: ['resume'], // Show error on resume field
     }
   );
