@@ -38,10 +38,12 @@ import { ExportButton } from "@/components/analysis/ExportButton";
 import { formatAsList } from "@/lib/copyToClipboard";
 import type { AnalysisResponse, AISuggestion, RewrittenBullet, ATSIssue } from "@/types/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 type UploadMode = "upload" | "select";
 
 export default function Home() {
+  usePageTitle("Resume Analysis");
   const [result, setResult] = useState<AnalysisResponse | null>(null);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   const [uploadMode, setUploadMode] = useState<UploadMode>("upload");

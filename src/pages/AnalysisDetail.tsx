@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/retroui/Button";
 import { Badge } from "@/components/retroui/Badge";
 import { Alert } from "@/components/retroui/Alert";
+import { Skeleton, SkeletonCard } from "@/components/retroui/Skeleton";
 import { useAnalysisById } from "@/hooks/useAnalysisHistory";
 import type { AISuggestion, RewrittenBullet, ATSIssue } from "@/types/api";
 import { ScoreCard } from "@/components/analysis/ScoreCard";
@@ -25,8 +26,10 @@ import { CopyButton } from "@/components/analysis/CopyButton";
 import { KeywordMatchBar } from "@/components/analysis/KeywordMatchBar";
 import { ExportButton } from "@/components/analysis/ExportButton";
 import { formatAsList } from "@/lib/copyToClipboard";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 export const AnalysisDetail = () => {
+  usePageTitle("Analysis Results");
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: analysis, isLoading, error } = useAnalysisById(id || "");
@@ -44,10 +47,10 @@ export const AnalysisDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
-          <p className="mt-4 text-muted-foreground">Loading analysis...</p>
+      <div className="min-h-screen bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Skeleton className="w-40 h-10 mb-6" />
+          <SkeletonCard />
         </div>
       </div>
     );

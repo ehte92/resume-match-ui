@@ -6,14 +6,17 @@ import { Button } from '@/components/retroui/Button';
 import { Input } from '@/components/retroui/Input';
 import { Label } from '@/components/retroui/Label';
 import { AnalysisCard } from '@/components/analysis/AnalysisCard';
+import { SkeletonList } from '@/components/retroui/Skeleton';
 import { useAnalysisHistory, useDeleteAnalysis } from '@/hooks/useAnalysisHistory';
 import { useResumes } from '@/hooks/useResumes';
 import { ChevronLeft, ChevronRight, Search, SlidersHorizontal, X } from 'lucide-react';
 import type { AnalysisResponse } from '@/types/api';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 type SortOption = 'date-desc' | 'date-asc' | 'score-desc' | 'score-asc';
 
 export const Dashboard = () => {
+  usePageTitle('Dashboard');
   const navigate = useNavigate();
   const { user } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
@@ -274,9 +277,8 @@ export const Dashboard = () => {
           {/* White Content Section */}
           <div className="p-6 bg-white">
             {isLoading ? (
-              <div className="text-center py-12">
-                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
-                <p className="mt-4 text-muted-foreground">Loading analyses...</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <SkeletonList count={pageSize} variant="analysis" />
               </div>
             ) : error ? (
               <div className="text-center py-12">

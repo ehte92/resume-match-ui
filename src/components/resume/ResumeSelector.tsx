@@ -1,5 +1,6 @@
 import { FileText, Check, AlertCircle, Calendar } from 'lucide-react';
 import { Badge } from '@/components/retroui/Badge';
+import { Skeleton } from '@/components/retroui/Skeleton';
 import type { ResumeResponse } from '@/types/api';
 import { useResumes } from '@/hooks/useResumes';
 
@@ -35,9 +36,23 @@ export const ResumeSelector = ({ selectedResumeId, onSelectResume }: ResumeSelec
 
   if (isLoading) {
     return (
-      <div className="text-center py-8">
-        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
-        <p className="mt-4 text-muted-foreground">Loading resumes...</p>
+      <div className="space-y-3">
+        <Skeleton className="w-48 h-4" />
+        <div className="grid grid-cols-1 gap-3">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className="border-2 border-black rounded p-4 bg-white">
+              <div className="flex items-start gap-3">
+                <Skeleton variant="circle" className="w-6 h-6" />
+                <Skeleton variant="circle" className="w-6 h-6" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="w-3/4 h-4" />
+                  <Skeleton className="w-1/2 h-3" />
+                  <Skeleton className="w-1/3 h-3" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

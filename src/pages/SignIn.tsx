@@ -8,6 +8,7 @@ import { Button } from '@/components/retroui/Button';
 import { Input } from '@/components/retroui/Input';
 import { PasswordInput } from '@/components/retroui/PasswordInput';
 import { Label } from '@/components/retroui/Label';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 const signInSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -17,6 +18,7 @@ const signInSchema = z.object({
 type SignInFormData = z.infer<typeof signInSchema>;
 
 export const SignIn = () => {
+  usePageTitle('Sign In');
   const navigate = useNavigate();
   const { login, isLoading } = useAuth();
 

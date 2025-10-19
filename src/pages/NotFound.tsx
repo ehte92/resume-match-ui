@@ -2,8 +2,10 @@ import { useNavigate } from 'react-router';
 import { Home, LogIn, FileSearch, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/retroui/Button';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 export const NotFound = () => {
+  usePageTitle('404 - Page Not Found');
   const navigate = useNavigate();
   const { user } = useAuth();
 

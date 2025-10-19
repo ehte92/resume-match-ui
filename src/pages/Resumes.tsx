@@ -5,9 +5,12 @@ import { Button } from '@/components/retroui/Button';
 import { ResumeCard } from '@/components/resume/ResumeCard';
 import { EmptyResumeState } from '@/components/resume/EmptyResumeState';
 import { ResumeUploadModal } from '@/components/resume/ResumeUploadModal';
+import { SkeletonList } from '@/components/retroui/Skeleton';
 import { useResumes, useDeleteResume } from '@/hooks/useResumes';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 export const Resumes = () => {
+  usePageTitle('My Resumes');
   const [currentPage, setCurrentPage] = useState(1);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const pageSize = 6;
@@ -49,9 +52,8 @@ export const Resumes = () => {
           {/* White Content Section */}
           <div className="p-6 bg-white">
             {isLoading ? (
-              <div className="text-center py-12">
-                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
-                <p className="mt-4 text-muted-foreground">Loading resumes...</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <SkeletonList count={pageSize} variant="resume" />
               </div>
             ) : error ? (
               <div className="text-center py-12">
