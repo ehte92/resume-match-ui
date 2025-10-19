@@ -124,7 +124,7 @@ export const Dashboard = () => {
 
             {/* White Content Section */}
             <div className="p-6 bg-white">
-              <Button onClick={() => navigate('/')} className="w-full">
+              <Button onClick={() => navigate('/new-analysis')} className="w-full">
                 Start New Analysis
               </Button>
             </div>
@@ -346,7 +346,7 @@ export const Dashboard = () => {
                   <>
                     <p className="mb-4 text-lg">No analyses yet</p>
                     <p className="mb-6 text-sm">Start analyzing your resume to see results here</p>
-                    <Button onClick={() => navigate('/')}>
+                    <Button onClick={() => navigate('/new-analysis')}>
                       Create your first analysis
                     </Button>
                   </>
