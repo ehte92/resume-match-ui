@@ -1,10 +1,20 @@
 import { useNavigate } from 'react-router';
+import { useState } from 'react';
+import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/retroui/Button';
+import { AnalysisCard } from '@/components/analysis/AnalysisCard';
+import { useAnalysisHistory, useDeleteAnalysis } from '@/hooks/useAnalysisHistory';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 6;
+
+  const { data: analysisData, isLoading, error } = useAnalysisHistory(currentPage, pageSize);
+  const { mutate: deleteAnalysis, isPending: isDeleting } = useDeleteAnalysis();
 
   return (
     <div className="min-h-screen bg-background">
@@ -67,22 +77,86 @@ export const Dashboard = () => {
           </div>
         </div>
 
-        {/* Past Analyses Section (Placeholder) */}
+        {/* Past Analyses Section */}
         <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden">
           {/* Colored Header Section */}
           <div className="bg-gradient-to-br from-primary to-primary-hover p-6">
             <h3 className="text-xl font-bold text-foreground">Recent Analyses</h3>
-            <p className="text-foreground/80 text-sm mt-1">Your previous resume analyses</p>
+            <p className="text-foreground/80 text-sm mt-1">
+              {analysisData?.total
+                ? `${analysisData.total} total analysis${analysisData.total !== 1 ? 'es' : ''}`
+                : 'Your previous resume analyses'}
+            </p>
           </div>
 
           {/* White Content Section */}
           <div className="p-6 bg-white">
-            <div className="text-center py-8 text-muted-foreground">
-              <p className="mb-4">No analyses yet</p>
-              <Button variant="outline" onClick={() => navigate('/')}>
-                Create your first analysis
-              </Button>
-            </div>
+            {isLoading ? (
+              <div className="text-center py-12">
+                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
+                <p className="mt-4 text-muted-foreground">Loading analyses...</p>
+              </div>
+            ) : error ? (
+              <div className="text-center py-12">
+                <p className="text-destructive mb-4">Failed to load analyses</p>
+                <Button variant="outline" onClick={() => window.location.reload()}>
+                  Retry
+                </Button>
+              </div>
+            ) : analysisData && analysisData.analyses.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                  {analysisData.analyses.map((analysis) => (
+                    <AnalysisCard
+                      key={analysis.id}
+                      analysis={analysis}
+                      onDelete={(id) => {
+                        deleteAnalysis(id, {
+                          onSuccess: () => toast.success('Analysis deleted successfully'),
+                          onError: () => toast.error('Failed to delete analysis'),
+                        });
+                      }}
+                      isDeleting={isDeleting}
+                    />
+                  ))}
+                </div>
+
+                {/* Pagination Controls */}
+                {analysisData.total > pageSize && (
+                  <div className="flex items-center justify-between border-t pt-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft className="h-4 w-4 mr-2" />
+                      Previous
+                    </Button>
+
+                    <span className="text-sm text-muted-foreground">
+                      Page {currentPage} of {Math.ceil(analysisData.total / pageSize)}
+                    </span>
+
+                    <Button
+                      variant="outline"
+                      onClick={() => setCurrentPage((p) => p + 1)}
+                      disabled={currentPage >= Math.ceil(analysisData.total / pageSize)}
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                <p className="mb-4 text-lg">No analyses yet</p>
+                <p className="mb-6 text-sm">Start analyzing your resume to see results here</p>
+                <Button onClick={() => navigate('/')}>
+                  Create your first analysis
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>

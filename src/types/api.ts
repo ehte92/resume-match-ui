@@ -24,12 +24,9 @@ export interface AISuggestion {
 }
 
 export interface RewrittenBullet {
-  section: string;
   original: string;
   improved: string;
-  changes_made: string[];
-  keywords_added: string[];
-  score_improvement: number;
+  reason?: string;
 }
 
 export interface AnalysisResponse {
@@ -56,4 +53,11 @@ export interface APIError {
   message: string;
   status: number;
   data?: unknown;
+}
+
+export interface AnalysisListResponse {
+  analyses: AnalysisResponse[];
+  total: number;
+  page: number;
+  page_size: number;
 }

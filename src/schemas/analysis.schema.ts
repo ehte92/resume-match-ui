@@ -22,6 +22,8 @@ export const analysisFormSchema = z.object({
     .string()
     .min(50, { message: 'Job description must be at least 50 characters' })
     .max(10000, { message: 'Job description is too long (max 10,000 characters)' }),
+  jobTitle: z.string().optional(),
+  companyName: z.string().optional(),
 });
 
 export type AnalysisFormData = z.infer<typeof analysisFormSchema>;

@@ -8,6 +8,8 @@ import {
   AlertCircle,
   CheckCircle,
   XCircle,
+  Briefcase,
+  Building2,
 } from "lucide-react";
 import {
   analysisFormSchema,
@@ -55,6 +57,8 @@ export default function Home() {
     const analysisRequest = {
       file,
       job_description: data.jobDescription,
+      job_title: data.jobTitle,
+      company_name: data.companyName,
     };
 
     analyzeResume(analysisRequest, {
@@ -176,6 +180,34 @@ export default function Home() {
                     )}
                   </div>
 
+                  {/* Optional: Job Title */}
+                  <div>
+                    <Label htmlFor="jobTitle" className="mb-2">
+                      Job Title{" "}
+                      <span className="text-sm text-muted-foreground">(Optional)</span>
+                    </Label>
+                    <Input
+                      id="jobTitle"
+                      type="text"
+                      placeholder="e.g., Senior Software Engineer"
+                      {...register("jobTitle")}
+                    />
+                  </div>
+
+                  {/* Optional: Company Name */}
+                  <div>
+                    <Label htmlFor="companyName" className="mb-2">
+                      Company Name{" "}
+                      <span className="text-sm text-muted-foreground">(Optional)</span>
+                    </Label>
+                    <Input
+                      id="companyName"
+                      type="text"
+                      placeholder="e.g., Tech Corp Inc."
+                      {...register("companyName")}
+                    />
+                  </div>
+
                   {/* Submit Button */}
                   <Button type="submit" disabled={isPending} className="w-full">
                     {isPending ? (
@@ -195,24 +227,76 @@ export default function Home() {
             <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden">
               {/* Colored Header Section */}
               <div className="bg-gradient-to-br from-primary to-primary-hover p-8">
-                <h2 className="text-3xl font-bold text-foreground">
+                <h2 className="text-3xl font-bold text-foreground mb-4">
                   Analysis Results
                 </h2>
+
+                {/* Job Info */}
+                {(result.job_title || result.company_name) && (
+                  <div className="space-y-2">
+                    {result.job_title && (
+                      <div className="flex items-center gap-2">
+                        <Briefcase className="h-5 w-5 text-foreground" />
+                        <span className="text-lg text-foreground font-medium">
+                          {result.job_title}
+                        </span>
+                      </div>
+                    )}
+                    {result.company_name && (
+                      <div className="flex items-center gap-2">
+                        <Building2 className="h-5 w-5 text-foreground/80" />
+                        <span className="text-foreground/80">{result.company_name}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* White Content Section */}
               <div className="p-8 bg-white space-y-8">
-                {/* Match Score */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-lg font-medium text-foreground">
+                {/* Scores Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Match Score */}
+                  <div className="text-center p-6 border-2 border-black rounded shadow-md bg-gradient-to-br from-green-50 to-green-100">
+                    <p className="text-sm font-medium text-muted-foreground mb-2">
                       Match Score
-                    </span>
-                    <span className="text-3xl font-bold text-primary">
-                      {result.match_score}%
-                    </span>
+                    </p>
+                    <p className="text-4xl font-bold text-green-600">
+                      {Number(result.match_score)?.toFixed(0) || 0}%
+                    </p>
+                    <Progress
+                      value={Number(result.match_score) || 0}
+                      className="h-3 mt-4"
+                    />
                   </div>
-                  <Progress value={result.match_score} className="h-4" />
+
+                  {/* ATS Score */}
+                  <div className="text-center p-6 border-2 border-black rounded shadow-md bg-gradient-to-br from-blue-50 to-blue-100">
+                    <p className="text-sm font-medium text-muted-foreground mb-2">
+                      ATS Score
+                    </p>
+                    <p className="text-4xl font-bold text-blue-600">
+                      {Number(result.ats_score)?.toFixed(0) || 0}%
+                    </p>
+                    <Progress
+                      value={Number(result.ats_score) || 0}
+                      className="h-3 mt-4"
+                    />
+                  </div>
+
+                  {/* Semantic Similarity */}
+                  <div className="text-center p-6 border-2 border-black rounded shadow-md bg-gradient-to-br from-purple-50 to-purple-100">
+                    <p className="text-sm font-medium text-muted-foreground mb-2">
+                      Semantic Similarity
+                    </p>
+                    <p className="text-4xl font-bold text-purple-600">
+                      {Number(result.semantic_similarity)?.toFixed(0) || 0}%
+                    </p>
+                    <Progress
+                      value={Number(result.semantic_similarity) || 0}
+                      className="h-3 mt-4"
+                    />
+                  </div>
                 </div>
 
                 {/* Keywords */}
@@ -263,24 +347,130 @@ export default function Home() {
                 </div>
 
                 {/* ATS Issues */}
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-4">
-                    ATS Compatibility Issues
-                  </h3>
-                  <ul className="space-y-2">
-                    {result.ats_issues.map((issue, index) => (
-                      <li key={index} className="flex items-start">
-                        <AlertCircle className="h-5 w-5 text-yellow-500 mr-2 mt-0.5 flex-shrink-0" />
-                        <span className="text-foreground">{issue.message}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                {result.ats_issues && result.ats_issues.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold text-foreground mb-4">
+                      ATS Compatibility Issues
+                    </h3>
+                    <div className="border-2 border-black rounded p-4 shadow-md bg-yellow-50">
+                      <ul className="space-y-3">
+                        {result.ats_issues.map((issue, index) => (
+                          <li key={index} className="flex items-start gap-3">
+                            <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                            <div>
+                              <p className="text-foreground font-medium">{issue.message}</p>
+                              {issue.recommendation && (
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  {issue.recommendation}
+                                </p>
+                              )}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
+
+                {/* AI Suggestions */}
+                {result.ai_suggestions && result.ai_suggestions.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold text-foreground mb-4">
+                      AI-Powered Suggestions
+                    </h3>
+                    <div className="space-y-4">
+                      {result.ai_suggestions.map((suggestion, index) => (
+                        <div
+                          key={index}
+                          className="border-2 border-black rounded p-4 shadow-md bg-blue-50"
+                        >
+                          <div className="flex items-start justify-between mb-2">
+                            <h4 className="font-medium text-foreground">
+                              {suggestion.type}
+                            </h4>
+                            <Badge
+                              variant="outline"
+                              className={`
+                                ${
+                                  suggestion.priority === "high"
+                                    ? "border-red-500 text-red-700"
+                                    : suggestion.priority === "medium"
+                                      ? "border-yellow-500 text-yellow-700"
+                                      : "border-blue-500 text-blue-700"
+                                }
+                              `}
+                            >
+                              {suggestion.priority} priority
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            {suggestion.issue}
+                          </p>
+                          <p className="text-sm text-foreground">{suggestion.suggestion}</p>
+                          {suggestion.example && (
+                            <div className="mt-2 p-2 bg-white rounded border border-gray-300">
+                              <p className="text-xs text-muted-foreground mb-1">
+                                Example:
+                              </p>
+                              <p className="text-sm text-foreground italic">
+                                {suggestion.example}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Rewritten Bullets */}
+                {result.rewritten_bullets && result.rewritten_bullets.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold text-foreground mb-4">
+                      AI-Improved Bullet Points
+                    </h3>
+                    <div className="space-y-4">
+                      {result.rewritten_bullets.map((bullet, index) => (
+                        <div
+                          key={index}
+                          className="border-2 border-black rounded p-4 shadow-md"
+                        >
+                          <div className="mb-3">
+                            <p className="text-xs font-medium text-muted-foreground mb-1">
+                              Original:
+                            </p>
+                            <p className="text-sm text-gray-600 line-through">
+                              {bullet.original}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-medium text-green-700 mb-1">
+                              Improved:
+                            </p>
+                            <p className="text-sm text-foreground font-medium">
+                              {bullet.improved}
+                            </p>
+                          </div>
+                          {bullet.reason && (
+                            <p className="text-xs text-muted-foreground mt-2 italic">
+                              {bullet.reason}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Processing Time */}
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-muted-foreground border-t pt-4">
                   Analysis completed in{" "}
                   {(result.processing_time_ms / 1000).toFixed(2)} seconds
+                  {result.openai_tokens_used && (
+                    <span className="ml-4">
+                      • {result.openai_tokens_used} AI tokens used
+                    </span>
+                  )}
                 </div>
 
                 {/* Reset Button */}

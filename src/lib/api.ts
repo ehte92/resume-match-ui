@@ -1,5 +1,5 @@
 import apiClient from './axios';
-import type { AnalysisRequest, AnalysisResponse } from '@/types/api';
+import type { AnalysisRequest, AnalysisResponse, AnalysisListResponse } from '@/types/api';
 
 export const analyzeResume = async (data: AnalysisRequest): Promise<AnalysisResponse> => {
   const formData = new FormData();
@@ -24,4 +24,20 @@ export const analyzeResume = async (data: AnalysisRequest): Promise<AnalysisResp
   );
 
   return response.data;
+};
+
+export const getAnalyses = async (page: number = 1, pageSize: number = 10): Promise<AnalysisListResponse> => {
+  const response = await apiClient.get<AnalysisListResponse>('/api/analyses/', {
+    params: { page, page_size: pageSize },
+  });
+  return response.data;
+};
+
+export const getAnalysisById = async (id: string): Promise<AnalysisResponse> => {
+  const response = await apiClient.get<AnalysisResponse>(`/api/analyses/${id}`);
+  return response.data;
+};
+
+export const deleteAnalysis = async (id: string): Promise<void> => {
+  await apiClient.delete(`/api/analyses/${id}`);
 };
