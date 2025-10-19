@@ -6,6 +6,7 @@ import { SignUp } from "@/pages/SignUp";
 import { Dashboard } from "@/pages/Dashboard";
 import { AnalysisDetail } from "@/pages/AnalysisDetail";
 import { Resumes } from "@/pages/Resumes";
+import { NotFound } from "@/pages/NotFound";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 // Layout wrapper component
@@ -39,6 +40,9 @@ function App() {
             <Route path="/analysis/:id" element={<AnalysisDetail />} />
           </Route>
         </Route>
+
+        {/* 404 Not Found - Catch all unmatched routes */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
