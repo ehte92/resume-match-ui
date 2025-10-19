@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/retroui/Button';
 import { AnalysisCard } from '@/components/analysis/AnalysisCard';
 import { useAnalysisHistory, useDeleteAnalysis } from '@/hooks/useAnalysisHistory';
+import { useResumes } from '@/hooks/useResumes';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export const Dashboard = () => {
@@ -15,6 +16,7 @@ export const Dashboard = () => {
 
   const { data: analysisData, isLoading, error } = useAnalysisHistory(currentPage, pageSize);
   const { mutate: deleteAnalysis, isPending: isDeleting } = useDeleteAnalysis();
+  const { data: resumeData } = useResumes(1, 1); // Fetch first page to get total count
 
   return (
     <div className="min-h-screen bg-background">
@@ -30,7 +32,7 @@ export const Dashboard = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden">
             {/* Colored Header Section */}
             <div className="bg-gradient-to-br from-primary to-primary-hover p-6">
@@ -44,6 +46,25 @@ export const Dashboard = () => {
             <div className="p-6 bg-white">
               <Button onClick={() => navigate('/')} className="w-full">
                 Start New Analysis
+              </Button>
+            </div>
+          </div>
+
+          <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden">
+            {/* Colored Header Section */}
+            <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-6">
+              <h3 className="text-xl font-bold text-foreground">Resume Library</h3>
+              <p className="text-foreground/80 text-sm mt-1">
+                {resumeData?.total
+                  ? `${resumeData.total} resume${resumeData.total !== 1 ? 's' : ''} uploaded`
+                  : 'Manage your resumes'}
+              </p>
+            </div>
+
+            {/* White Content Section */}
+            <div className="p-6 bg-white">
+              <Button onClick={() => navigate('/resumes')} variant="secondary" className="w-full">
+                Manage Resumes
               </Button>
             </div>
           </div>

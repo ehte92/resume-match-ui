@@ -61,3 +61,29 @@ export interface AnalysisListResponse {
   page: number;
   page_size: number;
 }
+
+export interface ResumeResponse {
+  id: string;
+  user_id: string;
+  file_name: string;
+  file_type: string;
+  file_size: number;
+  file_path: string;
+  parsed_text: string | null;
+  parsed_data: Record<string, unknown> | null;
+  storage_backend: string;
+  download_url: string | null;
+  created_at: string;
+  updated_at: string | null;
+}
+
+export interface ResumeListResponse {
+  resumes: ResumeResponse[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface ResumeUploadRequest {
+  file: File;
+}

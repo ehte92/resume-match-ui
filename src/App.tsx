@@ -5,6 +5,7 @@ import { SignIn } from "@/pages/SignIn";
 import { SignUp } from "@/pages/SignUp";
 import { Dashboard } from "@/pages/Dashboard";
 import { AnalysisDetail } from "@/pages/AnalysisDetail";
+import { Resumes } from "@/pages/Resumes";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 // Layout wrapper component
@@ -34,6 +35,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/resumes" element={<Resumes />} />
             <Route path="/analysis/:id" element={<AnalysisDetail />} />
           </Route>
         </Route>

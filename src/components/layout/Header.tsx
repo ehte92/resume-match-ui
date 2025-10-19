@@ -40,6 +40,12 @@ export default function Header() {
                 >
                   Dashboard
                 </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => navigate("/resumes")}
+                >
+                  Resumes
+                </Button>
                 <Button onClick={handleLogout}>Logout</Button>
               </>
             ) : (
