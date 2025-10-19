@@ -88,3 +88,26 @@ export interface ResumeListResponse {
 export interface ResumeUploadRequest {
   file: File;
 }
+
+export interface UserProfileUpdateRequest {
+  full_name?: string;
+  email?: string;
+}
+
+export interface PasswordChangeRequest {
+  old_password: string;
+  new_password: string;
+}
+
+export interface PasswordChangeResponse {
+  message: string;
+}
+
+export interface AccountDeleteRequest {
+  password: string;
+  confirmation: string;
+}
+
+export interface AccountDeleteResponse {
+  message: string;
+}

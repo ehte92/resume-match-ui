@@ -7,6 +7,7 @@ import { SignUp } from "@/pages/SignUp";
 import { Dashboard } from "@/pages/Dashboard";
 import { AnalysisDetail } from "@/pages/AnalysisDetail";
 import { Resumes } from "@/pages/Resumes";
+import Settings from "@/pages/Settings";
 import { NotFound } from "@/pages/NotFound";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
@@ -48,6 +49,7 @@ function App() {
             <Route path="/new-analysis" element={<Home />} />
             <Route path="/resumes" element={<Resumes />} />
             <Route path="/analysis/:id" element={<AnalysisDetail />} />
+            <Route path="/settings" element={<Settings />} />
           </Route>
         </Route>
 
