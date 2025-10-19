@@ -6,6 +6,7 @@ import { Button } from '@/components/retroui/Button';
 import { Badge } from '@/components/retroui/Badge';
 import type { ResumeResponse } from '@/types/api';
 import { toast } from 'sonner';
+import { getResumeDownloadUrl } from '@/lib/api';
 
 interface ResumeCardProps {
   resume: ResumeResponse;
@@ -32,19 +33,18 @@ export const ResumeCard = ({ resume, onDelete, isDeleting = false }: ResumeCardP
 
   const handleDownload = async (e: React.MouseEvent) => {
     e.stopPropagation();
-
-    if (!resume.download_url) {
-      toast.error('Download URL not available for this resume');
-      return;
-    }
-
     setIsDownloading(true);
+
     try {
+      // Fetch signed download URL from API
+      const { download_url } = await getResumeDownloadUrl(resume.id);
+
       // Open download URL in new tab
-      window.open(resume.download_url, '_blank');
+      window.open(download_url, '_blank');
       toast.success('Download started');
-    } catch {
-      toast.error('Failed to download resume');
+    } catch (error) {
+      console.error('Download error:', error);
+      toast.error('Failed to download resume. Please try again.');
     } finally {
       setIsDownloading(false);
     }
@@ -135,16 +135,18 @@ export const ResumeCard = ({ resume, onDelete, isDeleting = false }: ResumeCardP
 
         {/* Action Buttons */}
         <div className="flex gap-2 pt-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={handleDownload}
-            disabled={isDownloading || !resume.download_url}
-            className="flex-1"
-          >
-            <Download className="h-4 w-4 mr-2" />
-            {isDownloading ? 'Downloading...' : 'Download'}
-          </Button>
+          {resume.storage_backend === 'r2' && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleDownload}
+              disabled={isDownloading}
+              className="flex-1"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              {isDownloading ? 'Downloading...' : 'Download'}
+            </Button>
+          )}
           <Button
             size="sm"
             onClick={handleUseForAnalysis}
