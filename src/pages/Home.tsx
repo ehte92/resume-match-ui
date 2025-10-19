@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocation } from "react-router";
+import { toast } from "sonner";
 import {
   Upload,
   FileText,
@@ -95,6 +96,13 @@ export default function Home() {
     analyzeResume(analysisRequest, {
       onSuccess: (response) => {
         setResult(response);
+        toast.success("Analysis completed successfully!");
+        // Scroll to results
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      },
+      onError: (error) => {
+        console.error("Analysis error:", error);
+        toast.error(error.message || "Failed to analyze resume. Please try again.");
       },
     });
   };
