@@ -11,6 +11,11 @@ import {
   XCircle,
   Briefcase,
   Building2,
+  Target,
+  FileCheck,
+  Brain,
+  Lightbulb,
+  Sparkles,
 } from "lucide-react";
 import {
   analysisFormSchema,
@@ -22,10 +27,14 @@ import { Label } from "@/components/retroui/Label";
 import { Input } from "@/components/retroui/Input";
 import { Textarea } from "@/components/retroui/Textarea";
 import { Alert } from "@/components/retroui/Alert";
-import { Progress } from "@/components/retroui/Progress";
 import { Badge } from "@/components/retroui/Badge";
 import { ResumeSelector } from "@/components/resume/ResumeSelector";
-import type { AnalysisResponse } from "@/types/api";
+import { ScoreCard } from "@/components/analysis/ScoreCard";
+import { CollapsibleSection } from "@/components/analysis/CollapsibleSection";
+import { CopyButton } from "@/components/analysis/CopyButton";
+import { KeywordMatchBar } from "@/components/analysis/KeywordMatchBar";
+import { formatAsList } from "@/lib/copyToClipboard";
+import type { AnalysisResponse, AISuggestion, RewrittenBullet, ATSIssue } from "@/types/api";
 import { useAuth } from "@/contexts/AuthContext";
 
 type UploadMode = "upload" | "select";
@@ -353,109 +362,135 @@ export default function Home() {
               <div className="p-8 bg-white space-y-8">
                 {/* Scores Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {/* Match Score */}
-                  <div className="text-center p-6 border-2 border-black rounded shadow-md bg-gradient-to-br from-green-50 to-green-100">
-                    <p className="text-sm font-medium text-muted-foreground mb-2">
-                      Match Score
-                    </p>
-                    <p className="text-4xl font-bold text-green-600">
-                      {Number(result.match_score)?.toFixed(0) || 0}%
-                    </p>
-                    <Progress
-                      value={Number(result.match_score) || 0}
-                      className="h-3 mt-4"
-                    />
-                  </div>
-
-                  {/* ATS Score */}
-                  <div className="text-center p-6 border-2 border-black rounded shadow-md bg-gradient-to-br from-blue-50 to-blue-100">
-                    <p className="text-sm font-medium text-muted-foreground mb-2">
-                      ATS Score
-                    </p>
-                    <p className="text-4xl font-bold text-blue-600">
-                      {Number(result.ats_score)?.toFixed(0) || 0}%
-                    </p>
-                    <Progress
-                      value={Number(result.ats_score) || 0}
-                      className="h-3 mt-4"
-                    />
-                  </div>
-
-                  {/* Semantic Similarity */}
-                  <div className="text-center p-6 border-2 border-black rounded shadow-md bg-gradient-to-br from-purple-50 to-purple-100">
-                    <p className="text-sm font-medium text-muted-foreground mb-2">
-                      Semantic Similarity
-                    </p>
-                    <p className="text-4xl font-bold text-purple-600">
-                      {Number(result.semantic_similarity)?.toFixed(0) || 0}%
-                    </p>
-                    <Progress
-                      value={Number(result.semantic_similarity) || 0}
-                      className="h-3 mt-4"
-                    />
-                  </div>
+                  <ScoreCard
+                    title="Match Score"
+                    score={Number(result.match_score) || 0}
+                    type="match"
+                    icon={<Target className="h-6 w-6 text-green-600" />}
+                    description="How well your resume matches the job description based on keywords and requirements"
+                  />
+                  <ScoreCard
+                    title="ATS Score"
+                    score={Number(result.ats_score) || 0}
+                    type="ats"
+                    icon={<FileCheck className="h-6 w-6 text-blue-600" />}
+                    description="Applicant Tracking System compatibility - higher scores mean better chances of passing automated screening"
+                  />
+                  <ScoreCard
+                    title="Semantic Similarity"
+                    score={Number(result.semantic_similarity) || 0}
+                    type="semantic"
+                    icon={<Brain className="h-6 w-6 text-purple-600" />}
+                    description="How semantically similar your experience is to the job requirements, beyond just keyword matching"
+                  />
                 </div>
 
                 {/* Keywords */}
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-4">
-                    Keywords
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <CheckCircle className="h-4 w-4 text-green-600" />
-                        <h4 className="text-sm font-medium text-green-700">
-                          Matched Keywords
-                        </h4>
+                <CollapsibleSection
+                  title="Keywords Analysis"
+                  icon={<Sparkles className="h-5 w-5 text-primary" />}
+                  defaultOpen={true}
+                >
+                  <div className="space-y-6">
+                    {/* Keyword Match Bar */}
+                    <KeywordMatchBar
+                      matchedCount={result.matching_keywords?.length || 0}
+                      totalCount={
+                        (result.matching_keywords?.length || 0) +
+                        (result.missing_keywords?.length || 0)
+                      }
+                    />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="border-2 border-black rounded p-4 shadow-md">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                            <h4 className="font-medium text-green-700">
+                              Matched Keywords ({result.matching_keywords?.length || 0})
+                            </h4>
+                          </div>
+                          {result.matching_keywords?.length > 0 && (
+                            <CopyButton
+                              text={formatAsList(result.matching_keywords)}
+                              label="Copy"
+                              size="sm"
+                            />
+                          )}
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {result.matching_keywords?.length ? (
+                            result.matching_keywords.map((keyword, index) => (
+                              <Badge
+                                key={index}
+                                variant="solid"
+                                className="bg-green-600 text-white border-2 border-black"
+                              >
+                                {keyword}
+                              </Badge>
+                            ))
+                          ) : (
+                            <p className="text-sm text-muted-foreground">
+                              No matching keywords found
+                            </p>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        {result.matching_keywords.map((keyword, index) => (
-                          <Badge
-                            key={index}
-                            variant="solid"
-                            className="bg-green-600 text-white border-2 border-black"
-                          >
-                            {keyword}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <XCircle className="h-4 w-4 text-red-600" />
-                        <h4 className="text-sm font-medium text-red-700">
-                          Missing Keywords
-                        </h4>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {result.missing_keywords.map((keyword, index) => (
-                          <Badge
-                            key={index}
-                            variant="solid"
-                            className="bg-red-600 text-white border-2 border-black"
-                          >
-                            {keyword}
-                          </Badge>
-                        ))}
+
+                      <div className="border-2 border-black rounded p-4 shadow-md">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <XCircle className="h-5 w-5 text-red-600" />
+                            <h4 className="font-medium text-red-700">
+                              Missing Keywords ({result.missing_keywords?.length || 0})
+                            </h4>
+                          </div>
+                          {result.missing_keywords?.length > 0 && (
+                            <CopyButton
+                              text={formatAsList(result.missing_keywords)}
+                              label="Copy"
+                              size="sm"
+                            />
+                          )}
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {result.missing_keywords?.length ? (
+                            result.missing_keywords.map((keyword, index) => (
+                              <Badge
+                                key={index}
+                                variant="solid"
+                                className="bg-red-600 text-white border-2 border-black"
+                              >
+                                {keyword}
+                              </Badge>
+                            ))
+                          ) : (
+                            <p className="text-sm text-muted-foreground">
+                              No missing keywords
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                </CollapsibleSection>
 
                 {/* ATS Issues */}
                 {result.ats_issues && result.ats_issues.length > 0 && (
-                  <div>
-                    <h3 className="text-xl font-semibold text-foreground mb-4">
-                      ATS Compatibility Issues
-                    </h3>
+                  <CollapsibleSection
+                    title={`ATS Compatibility Issues (${result.ats_issues.length})`}
+                    icon={<AlertCircle className="h-5 w-5 text-yellow-600" />}
+                    defaultOpen={true}
+                  >
                     <div className="border-2 border-black rounded p-4 shadow-md bg-yellow-50">
                       <ul className="space-y-3">
-                        {result.ats_issues.map((issue, index) => (
+                        {result.ats_issues.map((issue: ATSIssue, index: number) => (
                           <li key={index} className="flex items-start gap-3">
                             <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
                             <div>
-                              <p className="text-foreground font-medium">{issue.message}</p>
+                              <p className="text-foreground font-medium">
+                                {issue.message}
+                              </p>
                               {issue.recommendation && (
                                 <p className="text-sm text-muted-foreground mt-1">
                                   {issue.recommendation}
@@ -466,97 +501,113 @@ export default function Home() {
                         ))}
                       </ul>
                     </div>
-                  </div>
+                  </CollapsibleSection>
                 )}
 
                 {/* AI Suggestions */}
                 {result.ai_suggestions && result.ai_suggestions.length > 0 && (
-                  <div>
-                    <h3 className="text-xl font-semibold text-foreground mb-4">
-                      AI-Powered Suggestions
-                    </h3>
+                  <CollapsibleSection
+                    title={`AI-Powered Suggestions (${result.ai_suggestions.length})`}
+                    icon={<Lightbulb className="h-5 w-5 text-blue-600" />}
+                    defaultOpen={true}
+                  >
                     <div className="space-y-4">
-                      {result.ai_suggestions.map((suggestion, index) => (
-                        <div
-                          key={index}
-                          className="border-2 border-black rounded p-4 shadow-md bg-blue-50"
-                        >
-                          <div className="flex items-start justify-between mb-2">
-                            <h4 className="font-medium text-foreground">
-                              {suggestion.type}
-                            </h4>
-                            <Badge
-                              variant="outline"
-                              className={`
+                      {result.ai_suggestions.map(
+                        (suggestion: AISuggestion, index: number) => (
+                          <div
+                            key={index}
+                            className="border-2 border-black rounded p-4 shadow-md bg-blue-50"
+                          >
+                            <div className="flex items-start justify-between mb-2">
+                              <h4 className="font-medium text-foreground">
+                                {suggestion.type}
+                              </h4>
+                              <Badge
+                                variant="outline"
+                                className={`
                                 ${
                                   suggestion.priority === "high"
                                     ? "border-red-500 text-red-700"
                                     : suggestion.priority === "medium"
-                                      ? "border-yellow-500 text-yellow-700"
-                                      : "border-blue-500 text-blue-700"
+                                    ? "border-yellow-500 text-yellow-700"
+                                    : "border-blue-500 text-blue-700"
                                 }
                               `}
-                            >
-                              {suggestion.priority} priority
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            {suggestion.issue}
-                          </p>
-                          <p className="text-sm text-foreground">{suggestion.suggestion}</p>
-                          {suggestion.example && (
-                            <div className="mt-2 p-2 bg-white rounded border border-gray-300">
-                              <p className="text-xs text-muted-foreground mb-1">
-                                Example:
-                              </p>
-                              <p className="text-sm text-foreground italic">
-                                {suggestion.example}
-                              </p>
+                              >
+                                {suggestion.priority} priority
+                              </Badge>
                             </div>
-                          )}
-                        </div>
-                      ))}
+                            <p className="text-sm text-muted-foreground mb-2">
+                              {suggestion.issue}
+                            </p>
+                            <p className="text-sm text-foreground">
+                              {suggestion.suggestion}
+                            </p>
+                            {suggestion.example && (
+                              <div className="mt-2 p-2 bg-white rounded border border-gray-300">
+                                <p className="text-xs text-muted-foreground mb-1">
+                                  Example:
+                                </p>
+                                <p className="text-sm text-foreground italic">
+                                  {suggestion.example}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      )}
                     </div>
-                  </div>
+                  </CollapsibleSection>
                 )}
 
                 {/* Rewritten Bullets */}
                 {result.rewritten_bullets && result.rewritten_bullets.length > 0 && (
-                  <div>
-                    <h3 className="text-xl font-semibold text-foreground mb-4">
-                      AI-Improved Bullet Points
-                    </h3>
+                  <CollapsibleSection
+                    title={`AI-Improved Bullet Points (${result.rewritten_bullets.length})`}
+                    icon={<Sparkles className="h-5 w-5 text-green-600" />}
+                    defaultOpen={true}
+                  >
                     <div className="space-y-4">
-                      {result.rewritten_bullets.map((bullet, index) => (
-                        <div
-                          key={index}
-                          className="border-2 border-black rounded p-4 shadow-md"
-                        >
-                          <div className="mb-3">
-                            <p className="text-xs font-medium text-muted-foreground mb-1">
-                              Original:
-                            </p>
-                            <p className="text-sm text-gray-600 line-through">
-                              {bullet.original}
-                            </p>
+                      {result.rewritten_bullets.map(
+                        (bullet: RewrittenBullet, index: number) => (
+                          <div
+                            key={index}
+                            className="border-2 border-black rounded p-4 shadow-md"
+                          >
+                            <div className="flex justify-end mb-2">
+                              <CopyButton
+                                text={bullet.improved}
+                                label="Copy Improved"
+                                size="sm"
+                                variant="ghost"
+                              />
+                            </div>
+                            <div className="mb-3">
+                              <p className="text-xs font-medium text-muted-foreground mb-1">
+                                Original:
+                              </p>
+                              <p className="text-sm text-gray-600 line-through">
+                                {bullet.original}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs font-medium text-green-700 mb-1">
+                                Improved:
+                              </p>
+                              <p className="text-sm text-foreground font-medium">
+                                {bullet.improved}
+                              </p>
+                            </div>
+                            {bullet.reason && (
+                              <p className="text-xs text-muted-foreground mt-2 italic">
+                                {bullet.reason}
+                              </p>
+                            )}
                           </div>
-                          <div>
-                            <p className="text-xs font-medium text-green-700 mb-1">
-                              Improved:
-                            </p>
-                            <p className="text-sm text-foreground font-medium">
-                              {bullet.improved}
-                            </p>
-                          </div>
-                          {bullet.reason && (
-                            <p className="text-xs text-muted-foreground mt-2 italic">
-                              {bullet.reason}
-                            </p>
-                          )}
-                        </div>
-                      ))}
+                        )
+                      )}
                     </div>
-                  </div>
+                  </CollapsibleSection>
                 )}
 
                 {/* Processing Time */}
