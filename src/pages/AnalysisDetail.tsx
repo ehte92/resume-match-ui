@@ -23,6 +23,7 @@ import { ScoreCard } from "@/components/analysis/ScoreCard";
 import { CollapsibleSection } from "@/components/analysis/CollapsibleSection";
 import { CopyButton } from "@/components/analysis/CopyButton";
 import { KeywordMatchBar } from "@/components/analysis/KeywordMatchBar";
+import { ExportButton } from "@/components/analysis/ExportButton";
 import { formatAsList } from "@/lib/copyToClipboard";
 
 export const AnalysisDetail = () => {
@@ -93,9 +94,12 @@ export const AnalysisDetail = () => {
         <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden">
           {/* Colored Header Section */}
           <div className="bg-gradient-to-br from-primary to-primary-hover p-8">
-            <h2 className="text-3xl font-bold text-foreground mb-4">
-              Analysis Results
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-3xl font-bold text-foreground">
+                Analysis Results
+              </h2>
+              <ExportButton analysis={analysis} variant="secondary" />
+            </div>
 
             {/* Job Info */}
             <div className="space-y-2">

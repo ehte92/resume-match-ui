@@ -1,4 +1,5 @@
 import apiClient from './axios';
+import { getAccessToken } from './cookies';
 import type { AnalysisRequest, AnalysisResponse, AnalysisListResponse, ResumeResponse, ResumeListResponse } from '@/types/api';
 
 export const analyzeResume = async (data: AnalysisRequest): Promise<AnalysisResponse> => {
@@ -21,8 +22,12 @@ export const analyzeResume = async (data: AnalysisRequest): Promise<AnalysisResp
     formData.append('company_name', data.company_name);
   }
 
+  // Use authenticated endpoint if user is logged in, otherwise use guest endpoint
+  const isAuthenticated = !!getAccessToken();
+  const endpoint = isAuthenticated ? '/api/analyses/create' : '/api/analyses/create-guest';
+
   const response = await apiClient.post<AnalysisResponse>(
-    '/api/analyses/create-guest',
+    endpoint,
     formData,
     {
       headers: {
