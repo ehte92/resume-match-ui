@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useLocation } from "react-router";
 import {
   Upload,
   FileText,
@@ -23,11 +24,20 @@ import { Textarea } from "@/components/retroui/Textarea";
 import { Alert } from "@/components/retroui/Alert";
 import { Progress } from "@/components/retroui/Progress";
 import { Badge } from "@/components/retroui/Badge";
+import { ResumeSelector } from "@/components/resume/ResumeSelector";
 import type { AnalysisResponse } from "@/types/api";
+import { useAuth } from "@/contexts/AuthContext";
+
+type UploadMode = "upload" | "select";
 
 export default function Home() {
   const [result, setResult] = useState<AnalysisResponse | null>(null);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  const [uploadMode, setUploadMode] = useState<UploadMode>("upload");
+  const [selectedResumeId, setSelectedResumeId] = useState<string | null>(null);
+
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
 
   const {
     register,
@@ -35,6 +45,7 @@ export default function Home() {
     formState: { errors },
     reset,
     watch,
+    setValue,
   } = useForm<AnalysisFormData>({
     resolver: zodResolver(analysisFormSchema),
   });
@@ -42,6 +53,16 @@ export default function Home() {
   const { mutate: analyzeResume, isPending, error } = useAnalyzeResume();
 
   const resumeFiles = watch("resume");
+
+  // Handle pre-selected resume from navigation
+  useEffect(() => {
+    const state = location.state as { resumeId?: string } | null;
+    if (state?.resumeId && isAuthenticated) {
+      setUploadMode("select");
+      setSelectedResumeId(state.resumeId);
+      setValue("resumeId", state.resumeId);
+    }
+  }, [location.state, isAuthenticated, setValue]);
 
   // Update selected file name when file changes
   if (
@@ -53,9 +74,9 @@ export default function Home() {
   }
 
   const onSubmit = (data: AnalysisFormData) => {
-    const file = data.resume[0];
     const analysisRequest = {
-      file,
+      file: data.resume && data.resume.length > 0 ? data.resume[0] : undefined,
+      resume_id: data.resumeId,
       job_description: data.jobDescription,
       job_title: data.jobTitle,
       company_name: data.companyName,
@@ -72,6 +93,24 @@ export default function Home() {
     reset();
     setResult(null);
     setSelectedFileName(null);
+    setUploadMode("upload");
+    setSelectedResumeId(null);
+  };
+
+  const handleModeChange = (mode: UploadMode) => {
+    setUploadMode(mode);
+    if (mode === "upload") {
+      setSelectedResumeId(null);
+      setValue("resumeId", undefined);
+    } else {
+      setSelectedFileName(null);
+      setValue("resume", undefined);
+    }
+  };
+
+  const handleResumeSelect = (resumeId: string) => {
+    setSelectedResumeId(resumeId);
+    setValue("resumeId", resumeId);
   };
 
   return (
@@ -119,47 +158,105 @@ export default function Home() {
                 )}
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                  {/* File Upload */}
-                  <div>
-                    <Label htmlFor="resume" className="mb-2">
-                      Upload Resume (PDF or DOCX)
-                    </Label>
-                    <div className="border-2 border-black rounded p-8 text-center bg-background hover:border-primary transition-all shadow-md hover:shadow-lg cursor-pointer">
-                      <Input
-                        id="resume"
-                        type="file"
-                        accept=".pdf,.docx"
-                        className="hidden"
-                        {...register("resume")}
-                      />
-                      <label htmlFor="resume" className="cursor-pointer">
-                        {selectedFileName ? (
-                          <div className="text-primary">
-                            <FileText className="mx-auto h-12 w-12 mb-2" />
-                            <p className="font-medium">{selectedFileName}</p>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              Click to change file
-                            </p>
-                          </div>
-                        ) : (
-                          <div className="text-muted-foreground">
-                            <Upload className="mx-auto h-12 w-12 mb-2" />
-                            <p className="font-medium text-foreground">
-                              Drop your resume here or click to browse
-                            </p>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              PDF or DOCX up to 5MB
-                            </p>
-                          </div>
-                        )}
-                      </label>
+                  {/* Resume Source Selection - Only show for authenticated users */}
+                  {isAuthenticated && (
+                    <div>
+                      <Label className="mb-3">Resume Source</Label>
+                      <div className="flex border-2 border-black rounded overflow-hidden shadow-md">
+                        <button
+                          type="button"
+                          onClick={() => handleModeChange("upload")}
+                          className={`
+                            flex-1 px-4 py-3 font-medium transition-colors
+                            ${
+                              uploadMode === "upload"
+                                ? "bg-primary text-foreground"
+                                : "bg-white text-muted-foreground hover:bg-gray-50"
+                            }
+                          `}
+                        >
+                          <Upload className="inline-block h-4 w-4 mr-2" />
+                          Upload New
+                        </button>
+                        <div className="w-0.5 bg-black"></div>
+                        <button
+                          type="button"
+                          onClick={() => handleModeChange("select")}
+                          className={`
+                            flex-1 px-4 py-3 font-medium transition-colors
+                            ${
+                              uploadMode === "select"
+                                ? "bg-primary text-foreground"
+                                : "bg-white text-muted-foreground hover:bg-gray-50"
+                            }
+                          `}
+                        >
+                          <FileText className="inline-block h-4 w-4 mr-2" />
+                          Select from Library
+                        </button>
+                      </div>
                     </div>
-                    {errors.resume && (
-                      <p className="text-sm text-destructive mt-1">
-                        {errors.resume.message as string}
-                      </p>
-                    )}
-                  </div>
+                  )}
+
+                  {/* File Upload - Shown when in upload mode or for non-authenticated users */}
+                  {uploadMode === "upload" && (
+                    <div>
+                      <Label htmlFor="resume" className="mb-2">
+                        Upload Resume (PDF or DOCX)
+                      </Label>
+                      <div className="border-2 border-black rounded p-8 text-center bg-background hover:border-primary transition-all shadow-md hover:shadow-lg cursor-pointer">
+                        <Input
+                          id="resume"
+                          type="file"
+                          accept=".pdf,.docx"
+                          className="hidden"
+                          {...register("resume")}
+                        />
+                        <label htmlFor="resume" className="cursor-pointer">
+                          {selectedFileName ? (
+                            <div className="text-primary">
+                              <FileText className="mx-auto h-12 w-12 mb-2" />
+                              <p className="font-medium">{selectedFileName}</p>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                Click to change file
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="text-muted-foreground">
+                              <Upload className="mx-auto h-12 w-12 mb-2" />
+                              <p className="font-medium text-foreground">
+                                Drop your resume here or click to browse
+                              </p>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                PDF or DOCX up to 5MB
+                              </p>
+                            </div>
+                          )}
+                        </label>
+                      </div>
+                      {errors.resume && (
+                        <p className="text-sm text-destructive mt-1">
+                          {errors.resume.message as string}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Resume Selector - Shown when in select mode for authenticated users */}
+                  {uploadMode === "select" && isAuthenticated && (
+                    <div>
+                      <Label className="mb-2">Select from Your Library</Label>
+                      <ResumeSelector
+                        selectedResumeId={selectedResumeId}
+                        onSelectResume={handleResumeSelect}
+                      />
+                      {errors.resumeId && (
+                        <p className="text-sm text-destructive mt-1">
+                          {errors.resumeId.message as string}
+                        </p>
+                      )}
+                    </div>
+                  )}
 
                   {/* Job Description */}
                   <div>

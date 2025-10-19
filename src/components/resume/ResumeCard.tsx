@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type React from 'react';
+import { useNavigate } from 'react-router';
 import { Calendar, Trash2, FileText, Download, Play } from 'lucide-react';
 import { Button } from '@/components/retroui/Button';
 import { Badge } from '@/components/retroui/Badge';
@@ -9,13 +10,13 @@ import { toast } from 'sonner';
 interface ResumeCardProps {
   resume: ResumeResponse;
   onDelete: (id: string) => void;
-  onUseForAnalysis: (resume: ResumeResponse) => void;
   isDeleting?: boolean;
 }
 
-export const ResumeCard = ({ resume, onDelete, onUseForAnalysis, isDeleting = false }: ResumeCardProps) => {
+export const ResumeCard = ({ resume, onDelete, isDeleting = false }: ResumeCardProps) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const navigate = useNavigate();
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -51,7 +52,9 @@ export const ResumeCard = ({ resume, onDelete, onUseForAnalysis, isDeleting = fa
 
   const handleUseForAnalysis = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onUseForAnalysis(resume);
+    // Navigate to home page with resume ID in state
+    navigate('/', { state: { resumeId: resume.id } });
+    toast.info(`Selected ${resume.file_name} for analysis`);
   };
 
   const formatDate = (dateString: string) => {

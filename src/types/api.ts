@@ -1,5 +1,6 @@
 export interface AnalysisRequest {
-  file: File;
+  file?: File;
+  resume_id?: string;
   job_description: string;
   job_title?: string;
   company_name?: string;

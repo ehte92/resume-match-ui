@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/retroui/Button';
@@ -7,23 +6,14 @@ import { ResumeCard } from '@/components/resume/ResumeCard';
 import { EmptyResumeState } from '@/components/resume/EmptyResumeState';
 import { ResumeUploadModal } from '@/components/resume/ResumeUploadModal';
 import { useResumes, useDeleteResume } from '@/hooks/useResumes';
-import type { ResumeResponse } from '@/types/api';
 
 export const Resumes = () => {
-  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const pageSize = 6;
 
   const { data: resumeData, isLoading, error } = useResumes(currentPage, pageSize);
   const { mutate: deleteResume, isPending: isDeleting } = useDeleteResume();
-
-  const handleUseForAnalysis = (resume: ResumeResponse) => {
-    // Navigate to home page
-    // Note: In future, we can pass resume data via state or context
-    navigate('/');
-    toast.info(`Selected ${resume.file_name} for analysis`);
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -83,7 +73,6 @@ export const Resumes = () => {
                           onError: () => toast.error('Failed to delete resume'),
                         });
                       }}
-                      onUseForAnalysis={handleUseForAnalysis}
                       isDeleting={isDeleting}
                     />
                   ))}

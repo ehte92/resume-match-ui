@@ -3,7 +3,15 @@ import type { AnalysisRequest, AnalysisResponse, AnalysisListResponse, ResumeRes
 
 export const analyzeResume = async (data: AnalysisRequest): Promise<AnalysisResponse> => {
   const formData = new FormData();
-  formData.append('file', data.file);
+
+  // Add file or resume_id
+  if (data.file) {
+    formData.append('file', data.file);
+  }
+  if (data.resume_id) {
+    formData.append('resume_id', data.resume_id);
+  }
+
   formData.append('job_description', data.job_description);
 
   if (data.job_title) {
