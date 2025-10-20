@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import { Button } from '@/components/retroui/Button';
@@ -47,8 +47,10 @@ export default function Settings() {
 
       await refreshUser();
       toast.success('Profile updated successfully');
-    } catch (error: any) {
-      const message = error?.response?.data?.detail || 'Failed to update profile';
+    } catch (error: unknown) {
+      const message =
+        (error as { response?: { data?: { detail?: string } } })?.response?.data?.detail ||
+        'Failed to update profile';
       toast.error(message);
     } finally {
       setIsUpdatingProfile(false);
@@ -74,8 +76,10 @@ export default function Settings() {
       setOldPassword('');
       setNewPassword('');
       toast.success('Password changed successfully');
-    } catch (error: any) {
-      const message = error?.response?.data?.detail || 'Failed to change password';
+    } catch (error: unknown) {
+      const message =
+        (error as { response?: { data?: { detail?: string } } })?.response?.data?.detail ||
+        'Failed to change password';
       toast.error(message);
     } finally {
       setIsChangingPassword(false);
@@ -101,8 +105,10 @@ export default function Settings() {
       toast.success('Account deleted successfully');
       logout();
       navigate('/login');
-    } catch (error: any) {
-      const message = error?.response?.data?.detail || 'Failed to delete account';
+    } catch (error: unknown) {
+      const message =
+        (error as { response?: { data?: { detail?: string } } })?.response?.data?.detail ||
+        'Failed to delete account';
       toast.error(message);
       setIsDeletingAccount(false);
     }

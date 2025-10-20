@@ -17,10 +17,12 @@ import {
   Loader2,
   ChevronDown,
   Tag,
+  Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/retroui/Button';
 import { Textarea } from '@/components/retroui/Textarea';
 import { Badge } from '@/components/retroui/Badge';
+import { RefineModal } from '@/components/cover-letter/RefineModal';
 import { getCoverLetterById, exportCoverLetter } from '@/lib/api';
 import { useUpdateCoverLetter } from '@/hooks/useUpdateCoverLetter';
 import { useDeleteCoverLetter } from '@/hooks/useDeleteCoverLetter';
@@ -35,6 +37,7 @@ export const CoverLetterDetail = () => {
   const [isExportDropdownOpen, setIsExportDropdownOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState<'top' | 'bottom'>('bottom');
+  const [isRefineModalOpen, setIsRefineModalOpen] = useState(false);
   const exportDropdownRef = useRef<HTMLDivElement>(null);
   const exportButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -165,6 +168,19 @@ export const CoverLetterDetail = () => {
     });
   };
 
+  const handleAcceptRefinement = (refinedText: string) => {
+    if (!id) return;
+    updateCoverLetter(
+      { id, data: { cover_letter_text: refinedText } },
+      {
+        onSuccess: () => {
+          toast.success('Cover letter updated with refined version');
+        },
+        onError: () => toast.error('Failed to update cover letter'),
+      }
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -258,6 +274,14 @@ export const CoverLetterDetail = () => {
                     <Button variant="outline" onClick={handleEdit} className="flex-1">
                       <Edit3 className="mr-2 h-4 w-4" />
                       Edit
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsRefineModalOpen(true)}
+                      className="flex-1 border-purple-500 text-purple-700 hover:bg-purple-50"
+                    >
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Refine with AI
                     </Button>
                     <Button variant="outline" onClick={handleCopy}>
                       <Copy className="h-4 w-4" />
@@ -405,6 +429,14 @@ export const CoverLetterDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Refine Modal */}
+      <RefineModal
+        isOpen={isRefineModalOpen}
+        onClose={() => setIsRefineModalOpen(false)}
+        coverLetter={coverLetter}
+        onAcceptRefinement={handleAcceptRefinement}
+      />
     </div>
   );
 };

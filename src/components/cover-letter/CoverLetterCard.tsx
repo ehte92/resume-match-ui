@@ -1,3 +1,4 @@
+import React from 'react';
 import { useNavigate } from 'react-router';
 import { FileText, Briefcase, Building2, Eye, Trash2, Copy, Calendar, Tag } from 'lucide-react';
 import { Badge } from '@/components/retroui/Badge';

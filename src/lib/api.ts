@@ -10,6 +10,8 @@ import type {
   CoverLetterResponse,
   CoverLetterListResponse,
   CoverLetterUpdateRequest,
+  CoverLetterRefineRequest,
+  CoverLetterRefineResponse,
 } from '@/types/api';
 
 export const analyzeResume = async (data: AnalysisRequest): Promise<AnalysisResponse> => {
@@ -123,7 +125,7 @@ export const getCoverLetters = async (
   pageSize: number = 20,
   filters?: CoverLetterFilters
 ): Promise<CoverLetterListResponse> => {
-  const params: Record<string, any> = {
+  const params: Record<string, string | number> = {
     page,
     page_size: pageSize,
   };
@@ -171,5 +173,16 @@ export const exportCoverLetter = async (
 
 export const getAvailableTags = async (): Promise<import('@/types/api').TagCategories> => {
   const response = await apiClient.get('/api/cover-letters/tags');
+  return response.data;
+};
+
+export const refineCoverLetter = async (
+  id: string,
+  data: CoverLetterRefineRequest
+): Promise<CoverLetterRefineResponse> => {
+  const response = await apiClient.post<CoverLetterRefineResponse>(
+    `/api/cover-letters/${id}/refine`,
+    data
+  );
   return response.data;
 };

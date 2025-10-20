@@ -160,3 +160,16 @@ export interface CoverLetterListResponse {
 export interface CoverLetterUpdateRequest {
   cover_letter_text: string;
 }
+
+export interface CoverLetterRefineRequest {
+  refinement_instruction: string;
+}
+
+export interface CoverLetterRefineResponse {
+  original_cover_letter: CoverLetterResponse;
+  refined_cover_letter_text: string;
+  refinement_instruction: string;
+  tokens_used: number;
+  processing_time_ms: number;
+  word_count: number;
+}
