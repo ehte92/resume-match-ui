@@ -109,9 +109,36 @@ export const generateCoverLetter = async (data: CoverLetterGenerateRequest): Pro
   return response.data;
 };
 
-export const getCoverLetters = async (page: number = 1, pageSize: number = 20): Promise<CoverLetterListResponse> => {
+export interface CoverLetterFilters {
+  search?: string;
+  tags?: string[];
+  tone?: string | null;
+  length?: string | null;
+  sortBy?: string;
+  sortOrder?: string;
+}
+
+export const getCoverLetters = async (
+  page: number = 1,
+  pageSize: number = 20,
+  filters?: CoverLetterFilters
+): Promise<CoverLetterListResponse> => {
+  const params: Record<string, any> = {
+    page,
+    page_size: pageSize,
+  };
+
+  if (filters) {
+    if (filters.search) params.search = filters.search;
+    if (filters.tags && filters.tags.length > 0) params.tags = filters.tags.join(',');
+    if (filters.tone) params.tone = filters.tone;
+    if (filters.length) params.length = filters.length;
+    if (filters.sortBy) params.sort_by = filters.sortBy;
+    if (filters.sortOrder) params.sort_order = filters.sortOrder;
+  }
+
   const response = await apiClient.get<CoverLetterListResponse>('/api/cover-letters/', {
-    params: { page, page_size: pageSize },
+    params,
   });
   return response.data;
 };
@@ -128,4 +155,21 @@ export const updateCoverLetter = async (id: string, data: CoverLetterUpdateReque
 
 export const deleteCoverLetter = async (id: string): Promise<void> => {
   await apiClient.delete(`/api/cover-letters/${id}`);
+};
+
+export const exportCoverLetter = async (
+  id: string,
+  format: 'pdf' | 'docx' | 'txt',
+  includeMetadata: boolean = false
+): Promise<Blob> => {
+  const response = await apiClient.get(`/api/cover-letters/${id}/export`, {
+    params: { format, include_metadata: includeMetadata },
+    responseType: 'blob',
+  });
+  return response.data;
+};
+
+export const getAvailableTags = async (): Promise<import('@/types/api').TagCategories> => {
+  const response = await apiClient.get('/api/cover-letters/tags');
+  return response.data;
 };

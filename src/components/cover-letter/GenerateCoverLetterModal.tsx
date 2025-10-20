@@ -1,15 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { X, Loader2, Sparkles, AlertCircle, CheckCircle } from 'lucide-react';
+import { X, Loader2, Sparkles, AlertCircle, CheckCircle, Tag as TagIcon } from 'lucide-react';
 import { Button } from '@/components/retroui/Button';
 import { Label } from '@/components/retroui/Label';
 import { Input } from '@/components/retroui/Input';
 import { Textarea } from '@/components/retroui/Textarea';
+import { Badge } from '@/components/retroui/Badge';
 import { ResumeSelector } from '@/components/resume/ResumeSelector';
 import { useGenerateCoverLetter } from '@/hooks/useGenerateCoverLetter';
 import { coverLetterGenerateSchema, type CoverLetterGenerateFormData } from '@/schemas/cover-letter.schema';
+import { getAvailableTags } from '@/lib/api';
+import type { TagCategories } from '@/types/api';
 
 interface GenerateCoverLetterModalProps {
   isOpen: boolean;
@@ -31,6 +34,8 @@ export const GenerateCoverLetterModal = ({
   preFilledJobData,
 }: GenerateCoverLetterModalProps) => {
   const [selectedResumeId, setSelectedResumeId] = useState<string | null>(preSelectedResumeId || null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [availableTags, setAvailableTags] = useState<TagCategories | null>(null);
   const { mutate: generateCoverLetter, isPending } = useGenerateCoverLetter();
 
   const {
@@ -48,8 +53,18 @@ export const GenerateCoverLetterModal = ({
       company_name: preFilledJobData?.companyName || '',
       tone: 'professional',
       length: 'medium',
+      tags: [],
     },
   });
+
+  // Fetch available tags when modal opens
+  useEffect(() => {
+    if (isOpen && !availableTags) {
+      getAvailableTags()
+        .then(setAvailableTags)
+        .catch(() => toast.error('Failed to load tags'));
+    }
+  }, [isOpen, availableTags]);
 
   const jobDescription = watch('job_description');
   const jobDescriptionLength = jobDescription?.length || 0;
@@ -59,8 +74,22 @@ export const GenerateCoverLetterModal = ({
     setValue('resume_id', resumeId);
   };
 
+  const toggleTag = (tag: string) => {
+    setSelectedTags((prev) => {
+      const newTags = prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag];
+      setValue('tags', newTags);
+      return newTags;
+    });
+  };
+
   const onSubmit = (data: CoverLetterGenerateFormData) => {
-    generateCoverLetter(data, {
+    // Ensure tags are included
+    const submissionData = {
+      ...data,
+      tags: selectedTags.length > 0 ? selectedTags : undefined,
+    };
+
+    generateCoverLetter(submissionData, {
       onSuccess: (response) => {
         toast.success('Cover letter generated successfully!');
         onSuccess?.(response.id);
@@ -207,6 +236,46 @@ export const GenerateCoverLetterModal = ({
                 ))}
               </div>
             </div>
+
+            {/* Tags Selection */}
+            {availableTags && (
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <TagIcon className="h-4 w-4" />
+                  <Label>
+                    Tags <span className="text-xs text-muted-foreground">(Optional)</span>
+                  </Label>
+                </div>
+                <div className="border-2 border-black rounded p-4 max-h-48 overflow-y-auto space-y-3">
+                  {Object.entries(availableTags).map(([category, tags]) => (
+                    <div key={category}>
+                      <p className="text-xs font-medium text-muted-foreground mb-2 capitalize">
+                        {category.replace('_', ' ')}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {tags.slice(0, 6).map((tag) => (
+                          <Badge
+                            key={tag}
+                            variant={selectedTags.includes(tag) ? 'solid' : 'outline'}
+                            className={`cursor-pointer transition-all ${
+                              selectedTags.includes(tag)
+                                ? 'bg-primary text-white border-black'
+                                : 'hover:bg-primary/10'
+                            }`}
+                            onClick={() => toggleTag(tag)}
+                          >
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {selectedTags.length > 0 && (
+                  <p className="text-xs text-muted-foreground mt-2">{selectedTags.length} tag(s) selected</p>
+                )}
+              </div>
+            )}
 
             {/* Info Note */}
             <div className="bg-blue-50 border-2 border-blue-200 rounded p-4">

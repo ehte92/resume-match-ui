@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import { FileText, Briefcase, Building2, Eye, Trash2, Copy, Calendar } from 'lucide-react';
+import { FileText, Briefcase, Building2, Eye, Trash2, Copy, Calendar, Tag } from 'lucide-react';
 import { Badge } from '@/components/retroui/Badge';
 import { Button } from '@/components/retroui/Button';
 import type { CoverLetterResponse } from '@/types/api';
@@ -76,6 +76,25 @@ export const CoverLetterCard = ({ coverLetter, onDelete, isDeleting }: CoverLett
             {coverLetter.word_count} words
           </Badge>
         </div>
+
+        {/* Tags Section */}
+        {coverLetter.tags && coverLetter.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-3">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Tag className="h-3 w-3" />
+            </div>
+            {coverLetter.tags.slice(0, 3).map((tag) => (
+              <Badge key={tag} variant="outline" className="border-black text-xs">
+                {tag}
+              </Badge>
+            ))}
+            {coverLetter.tags.length > 3 && (
+              <Badge variant="outline" className="border-black text-xs text-muted-foreground">
+                +{coverLetter.tags.length - 3} more
+              </Badge>
+            )}
+          </div>
+        )}
 
         <div className="flex items-center text-xs text-muted-foreground mb-3">
           <Calendar className="h-3 w-3 mr-1" />

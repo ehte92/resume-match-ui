@@ -120,6 +120,7 @@ export interface CoverLetterGenerateRequest {
   company_name?: string;
   tone: 'professional' | 'enthusiastic' | 'balanced';
   length: 'short' | 'medium' | 'long';
+  tags?: string[];
 }
 
 export interface CoverLetterResponse {
@@ -132,11 +133,21 @@ export interface CoverLetterResponse {
   cover_letter_text: string;
   tone: string;
   length: string;
+  tags: string[] | null;
   openai_tokens_used: number;
   processing_time_ms: number;
   word_count: number | null;
   created_at: string;
   updated_at: string | null;
+}
+
+export interface TagCategories {
+  job_category: string[];
+  work_type: string[];
+  experience_level: string[];
+  industry: string[];
+  company_size: string[];
+  status: string[];
 }
 
 export interface CoverLetterListResponse {

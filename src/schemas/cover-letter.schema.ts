@@ -14,6 +14,7 @@ export const coverLetterGenerateSchema = z.object({
   length: z.enum(['short', 'medium', 'long'], {
     errorMap: () => ({ message: 'Please select a valid length' }),
   }),
+  tags: z.array(z.string()).optional(),
 });
 
 export const coverLetterUpdateSchema = z.object({

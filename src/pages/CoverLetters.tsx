@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
-import { Plus, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/retroui/Button';
-import { Input } from '@/components/retroui/Input';
 import { CoverLetterCard } from '@/components/cover-letter/CoverLetterCard';
 import { EmptyCoverLetterState } from '@/components/cover-letter/EmptyCoverLetterState';
 import { GenerateCoverLetterModal } from '@/components/cover-letter/GenerateCoverLetterModal';
+import { FilterBar, type FilterState } from '@/components/cover-letter/FilterBar';
 import { SkeletonList } from '@/components/retroui/Skeleton';
 import { useCoverLetters } from '@/hooks/useCoverLetters';
 import { useDeleteCoverLetter } from '@/hooks/useDeleteCoverLetter';
@@ -16,23 +16,30 @@ export const CoverLetters = () => {
   usePageTitle('Cover Letters');
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const pageSize = 9;
 
-  const { data: coverLetterData, isLoading, error } = useCoverLetters(currentPage, pageSize);
-  const { mutate: deleteCoverLetter, isPending: isDeleting } = useDeleteCoverLetter();
-
-  // Filter cover letters by search query
-  const filteredCoverLetters = coverLetterData?.cover_letters.filter((cl) => {
-    if (!searchQuery.trim()) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      cl.job_title?.toLowerCase().includes(query) ||
-      cl.company_name?.toLowerCase().includes(query) ||
-      cl.job_description?.toLowerCase().includes(query)
-    );
+  const [filters, setFilters] = useState<FilterState>({
+    search: '',
+    tags: [],
+    tone: null,
+    length: null,
+    sortBy: 'created_at',
+    sortOrder: 'desc',
   });
+
+  // Convert FilterState to API filters format
+  const apiFilters = {
+    search: filters.search || undefined,
+    tags: filters.tags.length > 0 ? filters.tags : undefined,
+    tone: filters.tone || undefined,
+    length: filters.length || undefined,
+    sortBy: filters.sortBy,
+    sortOrder: filters.sortOrder,
+  };
+
+  const { data: coverLetterData, isLoading, error } = useCoverLetters(currentPage, pageSize, apiFilters);
+  const { mutate: deleteCoverLetter, isPending: isDeleting } = useDeleteCoverLetter();
 
   const handleDelete = (id: string) => {
     deleteCoverLetter(id, {
@@ -44,6 +51,13 @@ export const CoverLetters = () => {
   const handleGenerateSuccess = (id: string) => {
     navigate(`/cover-letters/${id}`);
   };
+
+  const handleFiltersChange = (newFilters: FilterState) => {
+    setFilters(newFilters);
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  const hasActiveFilters = filters.search || filters.tags.length > 0 || filters.tone || filters.length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -63,18 +77,9 @@ export const CoverLetters = () => {
             </Button>
           </div>
 
-          {/* Search Bar */}
+          {/* Filter Bar */}
           {coverLetterData && coverLetterData.total > 0 && (
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search by job title, company, or description..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+            <FilterBar filters={filters} onFiltersChange={handleFiltersChange} />
           )}
         </div>
 
@@ -82,10 +87,10 @@ export const CoverLetters = () => {
         <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden">
           <div className="bg-gradient-to-br from-primary to-primary-hover p-6 border-b-2 border-black">
             <h3 className="text-xl font-bold text-foreground">
-              {filteredCoverLetters && filteredCoverLetters.length > 0
-                ? `${filteredCoverLetters.length} Cover Letter${
-                    filteredCoverLetters.length !== 1 ? 's' : ''
-                  }`
+              {coverLetterData?.cover_letters && coverLetterData.cover_letters.length > 0
+                ? `${coverLetterData.total} Cover Letter${
+                    coverLetterData.total !== 1 ? 's' : ''
+                  } ${hasActiveFilters ? '(Filtered)' : ''}`
                 : 'Your Cover Letters'}
             </h3>
           </div>
@@ -102,10 +107,10 @@ export const CoverLetters = () => {
                   Retry
                 </Button>
               </div>
-            ) : filteredCoverLetters && filteredCoverLetters.length > 0 ? (
+            ) : coverLetterData?.cover_letters && coverLetterData.cover_letters.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                  {filteredCoverLetters.map((coverLetter) => (
+                  {coverLetterData.cover_letters.map((coverLetter) => (
                     <CoverLetterCard
                       key={coverLetter.id}
                       coverLetter={coverLetter}
@@ -116,7 +121,7 @@ export const CoverLetters = () => {
                 </div>
 
                 {/* Pagination */}
-                {coverLetterData.total > pageSize && !searchQuery && (
+                {coverLetterData.total > pageSize && (
                   <div className="flex items-center justify-between border-t-2 border-black pt-4">
                     <Button
                       variant="outline"
@@ -142,11 +147,23 @@ export const CoverLetters = () => {
                   </div>
                 )}
               </>
-            ) : searchQuery ? (
+            ) : hasActiveFilters ? (
               <div className="text-center py-12 text-muted-foreground">
-                <p className="mb-4 text-lg">No cover letters match your search</p>
-                <Button variant="outline" onClick={() => setSearchQuery('')}>
-                  Clear Search
+                <p className="mb-4 text-lg">No cover letters match your filters</p>
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    setFilters({
+                      search: '',
+                      tags: [],
+                      tone: null,
+                      length: null,
+                      sortBy: 'created_at',
+                      sortOrder: 'desc',
+                    })
+                  }
+                >
+                  Clear Filters
                 </Button>
               </div>
             ) : (
