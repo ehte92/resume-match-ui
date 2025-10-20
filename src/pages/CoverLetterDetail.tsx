@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
   ArrowLeft,
@@ -18,12 +18,13 @@ import {
   ChevronDown,
   Tag,
   Sparkles,
+  BookTemplate,
 } from 'lucide-react';
 import { Button } from '@/components/retroui/Button';
 import { Textarea } from '@/components/retroui/Textarea';
 import { Badge } from '@/components/retroui/Badge';
 import { RefineModal } from '@/components/cover-letter/RefineModal';
-import { getCoverLetterById, exportCoverLetter } from '@/lib/api';
+import { getCoverLetterById, exportCoverLetter, createTemplate, getTemplateCategories } from '@/lib/api';
 import { useUpdateCoverLetter } from '@/hooks/useUpdateCoverLetter';
 import { useDeleteCoverLetter } from '@/hooks/useDeleteCoverLetter';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -38,6 +39,7 @@ export const CoverLetterDetail = () => {
   const [isExporting, setIsExporting] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState<'top' | 'bottom'>('bottom');
   const [isRefineModalOpen, setIsRefineModalOpen] = useState(false);
+  const [isSaveTemplateModalOpen, setIsSaveTemplateModalOpen] = useState(false);
   const exportDropdownRef = useRef<HTMLDivElement>(null);
   const exportButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -283,6 +285,14 @@ export const CoverLetterDetail = () => {
                       <Sparkles className="mr-2 h-4 w-4" />
                       Refine with AI
                     </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsSaveTemplateModalOpen(true)}
+                      className="flex-1 border-blue-500 text-blue-700 hover:bg-blue-50"
+                    >
+                      <BookTemplate className="mr-2 h-4 w-4" />
+                      Save as Template
+                    </Button>
                     <Button variant="outline" onClick={handleCopy}>
                       <Copy className="h-4 w-4" />
                     </Button>
@@ -437,6 +447,232 @@ export const CoverLetterDetail = () => {
         coverLetter={coverLetter}
         onAcceptRefinement={handleAcceptRefinement}
       />
+
+      {/* Save as Template Modal */}
+      <SaveAsTemplateModal
+        isOpen={isSaveTemplateModalOpen}
+        onClose={() => setIsSaveTemplateModalOpen(false)}
+        coverLetter={coverLetter}
+      />
     </div>
   );
 };
+
+// Save as Template Modal Component
+interface SaveAsTemplateModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  coverLetter: CoverLetterResponse;
+}
+
+function SaveAsTemplateModal({ isOpen, onClose, coverLetter }: SaveAsTemplateModalProps) {
+  const queryClient = useQueryClient();
+  const [templateName, setTemplateName] = useState('');
+  const [templateDescription, setTemplateDescription] = useState('');
+  const [category, setCategory] = useState('');
+  const [tone, setTone] = useState<'professional' | 'enthusiastic' | 'balanced'>(coverLetter.tone as 'professional' | 'enthusiastic' | 'balanced');
+  const [length, setLength] = useState<'short' | 'medium' | 'long'>(coverLetter.length as 'short' | 'medium' | 'long');
+
+  // Fetch categories
+  const { data: categories = [] } = useQuery({
+    queryKey: ['template-categories'],
+    queryFn: getTemplateCategories,
+    enabled: isOpen,
+  });
+
+  // Create template mutation
+  const createTemplateMutation = useMutation({
+    mutationFn: createTemplate,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['templates'] });
+      toast.success('Template saved successfully!');
+      onClose();
+      resetForm();
+    },
+    onError: () => {
+      toast.error('Failed to save template');
+    },
+  });
+
+  const resetForm = () => {
+    setTemplateName('');
+    setTemplateDescription('');
+    setCategory('');
+    setTone(coverLetter.tone as 'professional' | 'enthusiastic' | 'balanced');
+    setLength(coverLetter.length as 'short' | 'medium' | 'long');
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!templateName.trim()) {
+      toast.error('Please enter a template name');
+      return;
+    }
+
+    if (!category.trim()) {
+      toast.error('Please select or enter a category');
+      return;
+    }
+
+    createTemplateMutation.mutate({
+      name: templateName,
+      description: templateDescription || undefined,
+      category: category,
+      tone,
+      length,
+      template_text: coverLetter.cover_letter_text,
+    });
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={onClose}></div>
+
+      {/* Modal */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+          {/* Header */}
+          <div className="p-6 border-b-4 border-black bg-blue-100">
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-2xl font-black mb-1">Save as Template</h2>
+                <p className="text-sm text-gray-700">Create a reusable template from this cover letter</p>
+              </div>
+              <button
+                onClick={onClose}
+                className="ml-4 p-2 bg-white border-4 border-black hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6">
+            <div className="space-y-4">
+              {/* Template Name */}
+              <div>
+                <label className="block text-sm font-black mb-2">
+                  Template Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={templateName}
+                  onChange={(e) => setTemplateName(e.target.value)}
+                  placeholder="e.g., Software Engineer - Enthusiastic"
+                  className="w-full px-4 py-2 border-4 border-black font-bold focus:outline-none focus:translate-x-1 focus:translate-y-1 focus:shadow-none transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                  required
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-black mb-2">Description (optional)</label>
+                <textarea
+                  value={templateDescription}
+                  onChange={(e) => setTemplateDescription(e.target.value)}
+                  placeholder="Describe when to use this template..."
+                  rows={3}
+                  className="w-full px-4 py-2 border-4 border-black font-bold focus:outline-none focus:translate-x-1 focus:translate-y-1 focus:shadow-none transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] resize-none"
+                />
+              </div>
+
+              {/* Category */}
+              <div>
+                <label className="block text-sm font-black mb-2">
+                  Category <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full px-4 py-2 border-4 border-black font-bold focus:outline-none"
+                  required
+                >
+                  <option value="">Select a category</option>
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-2 text-xs text-gray-600">Or enter a new category:</p>
+                <input
+                  type="text"
+                  value={category && !categories.includes(category) ? category : ''}
+                  onChange={(e) => setCategory(e.target.value)}
+                  placeholder="Enter custom category"
+                  className="w-full mt-2 px-4 py-2 border-4 border-black font-bold focus:outline-none focus:translate-x-1 focus:translate-y-1 focus:shadow-none transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                />
+              </div>
+
+              {/* Tone */}
+              <div>
+                <label className="block text-sm font-black mb-2">Tone</label>
+                <select
+                  value={tone}
+                  onChange={(e) => setTone(e.target.value as 'professional' | 'enthusiastic' | 'balanced')}
+                  className="w-full px-4 py-2 border-4 border-black font-bold focus:outline-none"
+                >
+                  <option value="professional">Professional</option>
+                  <option value="enthusiastic">Enthusiastic</option>
+                  <option value="balanced">Balanced</option>
+                </select>
+              </div>
+
+              {/* Length */}
+              <div>
+                <label className="block text-sm font-black mb-2">Length</label>
+                <select
+                  value={length}
+                  onChange={(e) => setLength(e.target.value as 'short' | 'medium' | 'long')}
+                  className="w-full px-4 py-2 border-4 border-black font-bold focus:outline-none"
+                >
+                  <option value="short">Short</option>
+                  <option value="medium">Medium</option>
+                  <option value="long">Long</option>
+                </select>
+              </div>
+
+              {/* Preview */}
+              <div>
+                <label className="block text-sm font-black mb-2">Template Preview</label>
+                <div className="p-4 bg-gray-50 border-4 border-black max-h-48 overflow-y-auto">
+                  <p className="text-sm font-mono whitespace-pre-wrap">{coverLetter.cover_letter_text}</p>
+                </div>
+                <p className="mt-2 text-xs text-gray-600">
+                  Tip: You can manually edit the template text later by creating the template and then editing it.
+                </p>
+              </div>
+            </div>
+          </form>
+
+          {/* Footer */}
+          <div className="p-6 border-t-4 border-black bg-gray-100">
+            <div className="flex gap-3 justify-end">
+              <Button variant="outline" onClick={onClose} disabled={createTemplateMutation.isPending}>
+                Cancel
+              </Button>
+              <Button onClick={handleSubmit} disabled={createTemplateMutation.isPending}>
+                {createTemplateMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Save Template
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}

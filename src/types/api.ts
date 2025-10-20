@@ -173,3 +173,53 @@ export interface CoverLetterRefineResponse {
   processing_time_ms: number;
   word_count: number;
 }
+
+// Cover Letter Template Types
+export interface CoverLetterTemplateResponse {
+  id: string;
+  name: string;
+  description: string | null;
+  category: string;
+  tone: 'professional' | 'enthusiastic' | 'balanced';
+  length: 'short' | 'medium' | 'long';
+  template_text: string;
+  is_system: boolean;
+  user_id: string | null;
+  usage_count: number;
+  created_at: string;
+  updated_at: string | null;
+}
+
+export interface CoverLetterTemplateListResponse {
+  templates: CoverLetterTemplateResponse[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface CoverLetterTemplateCreateRequest {
+  name: string;
+  description?: string;
+  category: string;
+  tone: 'professional' | 'enthusiastic' | 'balanced';
+  length: 'short' | 'medium' | 'long';
+  template_text: string;
+}
+
+export interface CoverLetterTemplateUpdateRequest {
+  name?: string;
+  description?: string;
+  category?: string;
+  tone?: 'professional' | 'enthusiastic' | 'balanced';
+  length?: 'short' | 'medium' | 'long';
+  template_text?: string;
+}
+
+export interface CoverLetterGenerateFromTemplateRequest {
+  template_id: string;
+  resume_id: string;
+  job_description: string;
+  job_title?: string;
+  company_name?: string;
+  tags?: string[];
+}

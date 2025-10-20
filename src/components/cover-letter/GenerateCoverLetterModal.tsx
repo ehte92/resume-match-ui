@@ -2,17 +2,19 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { X, Loader2, Sparkles, AlertCircle, CheckCircle, Tag as TagIcon } from 'lucide-react';
+import { X, Loader2, Sparkles, AlertCircle, CheckCircle, Tag as TagIcon, BookTemplate } from 'lucide-react';
 import { Button } from '@/components/retroui/Button';
 import { Label } from '@/components/retroui/Label';
 import { Input } from '@/components/retroui/Input';
 import { Textarea } from '@/components/retroui/Textarea';
 import { Badge } from '@/components/retroui/Badge';
 import { ResumeSelector } from '@/components/resume/ResumeSelector';
+import TemplateBrowser from '@/components/templates/TemplateBrowser';
+import TemplatePreviewModal from '@/components/templates/TemplatePreviewModal';
 import { useGenerateCoverLetter } from '@/hooks/useGenerateCoverLetter';
 import { coverLetterGenerateSchema, type CoverLetterGenerateFormData } from '@/schemas/cover-letter.schema';
 import { getAvailableTags } from '@/lib/api';
-import type { TagCategories } from '@/types/api';
+import type { TagCategories, CoverLetterTemplateResponse } from '@/types/api';
 
 interface GenerateCoverLetterModalProps {
   isOpen: boolean;
@@ -36,6 +38,9 @@ export const GenerateCoverLetterModal = ({
   const [selectedResumeId, setSelectedResumeId] = useState<string | null>(preSelectedResumeId || null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [availableTags, setAvailableTags] = useState<TagCategories | null>(null);
+  const [viewMode, setViewMode] = useState<'form' | 'templates'>('form');
+  const [selectedTemplate, setSelectedTemplate] = useState<CoverLetterTemplateResponse | null>(null);
+  const [previewTemplate, setPreviewTemplate] = useState<CoverLetterTemplateResponse | null>(null);
   const { mutate: generateCoverLetter, isPending } = useGenerateCoverLetter();
 
   const {
@@ -104,28 +109,67 @@ export const GenerateCoverLetterModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white border-2 border-black shadow-2xl rounded max-w-3xl w-full max-h-[90vh] overflow-hidden">
-        {/* Header */}
-        <div className="bg-gradient-to-br from-primary to-primary-hover p-6 border-b-2 border-black">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Sparkles className="h-6 w-6 text-foreground" />
-              <h2 className="text-2xl font-bold text-foreground">Generate Cover Letter</h2>
+    <>
+      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div className="bg-white border-2 border-black shadow-2xl rounded max-w-5xl w-full max-h-[90vh] overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-br from-primary to-primary-hover p-6 border-b-2 border-black">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Sparkles className="h-6 w-6 text-foreground" />
+                <h2 className="text-2xl font-bold text-foreground">Generate Cover Letter</h2>
+              </div>
+              <button
+                onClick={onClose}
+                className="p-1 hover:bg-black/10 rounded transition-colors"
+                disabled={isPending}
+              >
+                <X className="h-5 w-5" />
+              </button>
             </div>
-            <button
-              onClick={onClose}
-              className="p-1 hover:bg-black/10 rounded transition-colors"
-              disabled={isPending}
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
-          <div className="space-y-6">
+            {/* View Mode Toggle */}
+            <div className="mt-4 flex gap-2">
+              <button
+                onClick={() => setViewMode('form')}
+                className={`px-4 py-2 border-2 border-black font-bold transition-all ${
+                  viewMode === 'form'
+                    ? 'bg-white text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
+                    : 'bg-transparent text-foreground hover:bg-white/20'
+                }`}
+              >
+                <Sparkles className="inline h-4 w-4 mr-2" />
+                Custom Generation
+              </button>
+              <button
+                onClick={() => setViewMode('templates')}
+                className={`px-4 py-2 border-2 border-black font-bold transition-all ${
+                  viewMode === 'templates'
+                    ? 'bg-white text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
+                    : 'bg-transparent text-foreground hover:bg-white/20'
+                }`}
+              >
+                <BookTemplate className="inline h-4 w-4 mr-2" />
+                Use Template
+              </button>
+            </div>
+          </div>
+
+        {/* Template View */}
+        {viewMode === 'templates' ? (
+          <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+            <TemplateBrowser
+              onSelectTemplate={(template) => {
+                setSelectedTemplate(template);
+                setPreviewTemplate(template);
+              }}
+              selectedTemplateId={selectedTemplate?.id}
+            />
+          </div>
+        ) : (
+          /* Form View */
+          <form onSubmit={handleSubmit(onSubmit)} className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+            <div className="space-y-6">
             {/* Resume Selection */}
             <div>
               <Label className="mb-2">Select Resume</Label>
@@ -285,29 +329,63 @@ export const GenerateCoverLetterModal = ({
                 description using your resume.
               </p>
             </div>
-          </div>
 
-          {/* Actions */}
-          <div className="flex gap-3 mt-6 pt-6 border-t-2 border-black">
-            <Button type="button" variant="outline" onClick={onClose} disabled={isPending} className="flex-1">
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isPending} className="flex-1">
-              {isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Generate Cover Letter
-                </>
+            {/* Actions */}
+            <div className="flex gap-3 mt-6 pt-6 border-t-2 border-black">
+              <Button type="button" variant="outline" onClick={onClose} disabled={isPending} className="flex-1">
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isPending} className="flex-1">
+                {isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Generate Cover Letter
+                  </>
+                )}
+              </Button>
+            </div>
+            </div>
+          </form>
+        )}
+
+        {/* Template Mode Footer */}
+        {viewMode === 'templates' && (
+          <div className="p-6 border-t-4 border-black bg-gray-100">
+            <div className="flex gap-3 justify-end">
+              <Button variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+              {selectedTemplate && (
+                <Button
+                  onClick={() => setPreviewTemplate(selectedTemplate)}
+                  variant="outline"
+                >
+                  Preview Template
+                </Button>
               )}
-            </Button>
+            </div>
           </div>
-        </form>
+        )}
+        </div>
       </div>
-    </div>
+
+      {/* Template Preview Modal */}
+      {previewTemplate && (
+        <TemplatePreviewModal
+          isOpen={!!previewTemplate}
+          onClose={() => setPreviewTemplate(null)}
+          template={previewTemplate}
+          onUseTemplate={() => {
+            toast.info('Template-based generation coming soon!');
+            setPreviewTemplate(null);
+          }}
+        />
+      )}
+    </>
   );
 };
