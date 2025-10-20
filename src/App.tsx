@@ -7,6 +7,8 @@ import { SignUp } from "@/pages/SignUp";
 import { Dashboard } from "@/pages/Dashboard";
 import { AnalysisDetail } from "@/pages/AnalysisDetail";
 import { Resumes } from "@/pages/Resumes";
+import { CoverLetters } from "@/pages/CoverLetters";
+import { CoverLetterDetail } from "@/pages/CoverLetterDetail";
 import Settings from "@/pages/Settings";
 import { NotFound } from "@/pages/NotFound";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -48,6 +50,8 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/new-analysis" element={<Home />} />
             <Route path="/resumes" element={<Resumes />} />
+            <Route path="/cover-letters" element={<CoverLetters />} />
+            <Route path="/cover-letters/:id" element={<CoverLetterDetail />} />
             <Route path="/analysis/:id" element={<AnalysisDetail />} />
             <Route path="/settings" element={<Settings />} />
           </Route>

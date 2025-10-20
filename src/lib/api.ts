@@ -1,6 +1,16 @@
 import apiClient from './axios';
 import { getAccessToken } from './cookies';
-import type { AnalysisRequest, AnalysisResponse, AnalysisListResponse, ResumeResponse, ResumeListResponse } from '@/types/api';
+import type {
+  AnalysisRequest,
+  AnalysisResponse,
+  AnalysisListResponse,
+  ResumeResponse,
+  ResumeListResponse,
+  CoverLetterGenerateRequest,
+  CoverLetterResponse,
+  CoverLetterListResponse,
+  CoverLetterUpdateRequest,
+} from '@/types/api';
 
 export const analyzeResume = async (data: AnalysisRequest): Promise<AnalysisResponse> => {
   const formData = new FormData();
@@ -91,4 +101,31 @@ export const deleteResume = async (id: string): Promise<void> => {
 export const getResumeDownloadUrl = async (id: string): Promise<{ download_url: string; expires_at: string }> => {
   const response = await apiClient.get(`/api/resumes/${id}/download`);
   return response.data;
+};
+
+// Cover Letter API functions
+export const generateCoverLetter = async (data: CoverLetterGenerateRequest): Promise<CoverLetterResponse> => {
+  const response = await apiClient.post<CoverLetterResponse>('/api/cover-letters/generate', data);
+  return response.data;
+};
+
+export const getCoverLetters = async (page: number = 1, pageSize: number = 20): Promise<CoverLetterListResponse> => {
+  const response = await apiClient.get<CoverLetterListResponse>('/api/cover-letters/', {
+    params: { page, page_size: pageSize },
+  });
+  return response.data;
+};
+
+export const getCoverLetterById = async (id: string): Promise<CoverLetterResponse> => {
+  const response = await apiClient.get<CoverLetterResponse>(`/api/cover-letters/${id}`);
+  return response.data;
+};
+
+export const updateCoverLetter = async (id: string, data: CoverLetterUpdateRequest): Promise<CoverLetterResponse> => {
+  const response = await apiClient.put<CoverLetterResponse>(`/api/cover-letters/${id}`, data);
+  return response.data;
+};
+
+export const deleteCoverLetter = async (id: string): Promise<void> => {
+  await apiClient.delete(`/api/cover-letters/${id}`);
 };

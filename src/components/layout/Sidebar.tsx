@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   PlusCircle,
   FolderOpen,
+  FileText,
   User,
   Settings,
   LogOut,
@@ -50,6 +51,12 @@ const navItems: NavItem[] = [
     label: 'My Resumes',
     icon: <FolderOpen className="h-5 w-5" />,
     path: '/resumes',
+  },
+  {
+    id: 'cover-letters',
+    label: 'Cover Letters',
+    icon: <FileText className="h-5 w-5" />,
+    path: '/cover-letters',
   },
 ];
 

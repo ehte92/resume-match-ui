@@ -111,3 +111,41 @@ export interface AccountDeleteRequest {
 export interface AccountDeleteResponse {
   message: string;
 }
+
+// Cover Letter Types
+export interface CoverLetterGenerateRequest {
+  resume_id: string;
+  job_description: string;
+  job_title?: string;
+  company_name?: string;
+  tone: 'professional' | 'enthusiastic' | 'balanced';
+  length: 'short' | 'medium' | 'long';
+}
+
+export interface CoverLetterResponse {
+  id: string;
+  user_id: string;
+  resume_id: string;
+  job_title: string | null;
+  company_name: string | null;
+  job_description: string;
+  cover_letter_text: string;
+  tone: string;
+  length: string;
+  openai_tokens_used: number;
+  processing_time_ms: number;
+  word_count: number | null;
+  created_at: string;
+  updated_at: string | null;
+}
+
+export interface CoverLetterListResponse {
+  cover_letters: CoverLetterResponse[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface CoverLetterUpdateRequest {
+  cover_letter_text: string;
+}
