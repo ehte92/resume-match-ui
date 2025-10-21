@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Outlet, Navigate } from "react-router";
 import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import { AppLayout } from "@/components/layout/AppLayout";
 import Home from "@/pages/Home";
 import { SignIn } from "@/pages/SignIn";
@@ -14,7 +15,7 @@ import { NotFound } from "@/pages/NotFound";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
 
-// Layout wrapper for public Home page (with old header)
+// Layout wrapper for public Home page (with header and footer)
 const PublicLayout = () => {
   const { isAuthenticated } = useAuth();
 
@@ -24,9 +25,12 @@ const PublicLayout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Header />
-      <Outlet />
+      <main className="flex-1">
+        <Outlet />
+      </main>
+      <Footer />
     </div>
   );
 };

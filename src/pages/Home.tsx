@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
 import {
   Upload,
@@ -17,6 +17,11 @@ import {
   Brain,
   Lightbulb,
   Sparkles,
+  Zap,
+  Library,
+  Mail,
+  Download,
+  Lock,
 } from "lucide-react";
 import {
   analysisFormSchema,
@@ -51,6 +56,7 @@ export default function Home() {
 
   const { isAuthenticated } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -145,39 +151,223 @@ export default function Home() {
   return (
     <>
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary to-primary-hover text-primary-foreground/80 border-b-5 border-black py-20">
+      <section className="bg-gradient-to-br from-primary to-primary-hover text-primary-foreground/80 border-b-5 border-black py-12 sm:py-16 md:py-20 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Optimize Your Resume for Any Job
+          <div className="text-center max-w-4xl mx-auto">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 leading-tight">
+              Optimize Your Resume with AI
             </h1>
-            <p className="text-xl md:text-2xl text-primary-foreground mb-8">
-              Get instant AI-powered feedback on your resume's match with job
-              descriptions
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-primary-foreground mb-6 sm:mb-8 max-w-3xl mx-auto px-4">
+              Get instant feedback on how well your resume matches any job description
             </p>
+            {!isAuthenticated && (
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
+                <Button
+                  size="lg"
+                  onClick={() => navigate("/signup")}
+                  className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4"
+                >
+                  Get Started
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  onClick={() => navigate("/signin")}
+                  className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4"
+                >
+                  Sign In
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </section>
 
+      {/* Features Section - Only for unauthenticated users */}
+      {!isAuthenticated && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3">
+              Everything You Need to Land Your Dream Job
+            </h2>
+            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+              Our AI-powered platform provides comprehensive resume analysis and optimization
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Feature 1: AI-Powered Analysis */}
+            <div className="border-2 border-black rounded-lg p-6 bg-white shadow-md hover:shadow-xl transition-shadow">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-primary rounded border-2 border-black">
+                  <Zap className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold text-foreground">AI-Powered Analysis</h3>
+              </div>
+              <p className="text-sm sm:text-base text-muted-foreground">
+                Get detailed match scores, ATS compatibility checks, and semantic similarity analysis to understand how well your resume fits the job
+              </p>
+            </div>
+
+            {/* Feature 2: Keyword Optimization */}
+            <div className="border-2 border-black rounded-lg p-6 bg-white shadow-md hover:shadow-xl transition-shadow">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-green-600 rounded border-2 border-black">
+                  <Target className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold text-foreground">Keyword Optimization</h3>
+              </div>
+              <p className="text-sm sm:text-base text-muted-foreground">
+                Instantly see which keywords you're matching and which ones you're missing from the job description
+              </p>
+            </div>
+
+            {/* Feature 3: AI Suggestions */}
+            <div className="border-2 border-black rounded-lg p-6 bg-white shadow-md hover:shadow-xl transition-shadow">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-blue-600 rounded border-2 border-black">
+                  <Lightbulb className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold text-foreground">Smart Suggestions</h3>
+              </div>
+              <p className="text-sm sm:text-base text-muted-foreground">
+                Receive personalized AI-generated recommendations to improve your resume's impact and effectiveness
+              </p>
+            </div>
+
+            {/* Feature 4: Resume Library */}
+            <div className="border-2 border-black rounded-lg p-6 bg-white shadow-md hover:shadow-xl transition-shadow">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-purple-600 rounded border-2 border-black">
+                  <Library className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold text-foreground">Resume Library</h3>
+              </div>
+              <p className="text-sm sm:text-base text-muted-foreground">
+                Store and manage multiple versions of your resume for different job applications
+              </p>
+            </div>
+
+            {/* Feature 5: Cover Letters */}
+            <div className="border-2 border-black rounded-lg p-6 bg-white shadow-md hover:shadow-xl transition-shadow">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-orange-600 rounded border-2 border-black">
+                  <Mail className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold text-foreground">Cover Letter Generation</h3>
+              </div>
+              <p className="text-sm sm:text-base text-muted-foreground">
+                Generate tailored cover letters based on your resume and the job description
+              </p>
+            </div>
+
+            {/* Feature 6: Export Options */}
+            <div className="border-2 border-black rounded-lg p-6 bg-white shadow-md hover:shadow-xl transition-shadow">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-teal-600 rounded border-2 border-black">
+                  <Download className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold text-foreground">Professional Exports</h3>
+              </div>
+              <p className="text-sm sm:text-base text-muted-foreground">
+                Download your analysis results as beautifully formatted PDFs for easy reference
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Main Content */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <section id="analysis-form" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="max-w-3xl mx-auto">
-          {!result ? (
-            /* Analysis Form */
+          {!isAuthenticated ? (
+            /* Authentication Gate for Unauthenticated Users */
+            <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden">
+              <div className="bg-gradient-to-br from-primary to-primary-hover p-6 sm:p-8 md:p-12 text-center">
+                <div className="flex justify-center mb-4">
+                  <div className="p-4 bg-white rounded-full border-4 border-black">
+                    <Lock className="h-12 w-12 sm:h-16 sm:w-16 text-primary" />
+                  </div>
+                </div>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4">
+                  Ready to Optimize Your Resume?
+                </h2>
+                <p className="text-base sm:text-lg text-foreground/80 mb-6 max-w-2xl mx-auto">
+                  Sign up for free to unlock all features and start improving your job applications today
+                </p>
+              </div>
+
+              <div className="p-6 sm:p-8 md:p-12 bg-white">
+                <div className="space-y-4 mb-8">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="font-bold text-foreground">AI-Powered Analysis</h3>
+                      <p className="text-sm text-muted-foreground">Get detailed match scores and ATS compatibility checks</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="font-bold text-foreground">Unlimited Resume Analysis</h3>
+                      <p className="text-sm text-muted-foreground">Analyze as many resumes as you need with no limits</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="font-bold text-foreground">Resume Library & Cover Letters</h3>
+                      <p className="text-sm text-muted-foreground">Store resumes and generate tailored cover letters</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="font-bold text-foreground">Export to PDF</h3>
+                      <p className="text-sm text-muted-foreground">Download professional PDF reports of your analysis</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button
+                    size="lg"
+                    onClick={() => navigate("/signup")}
+                    className="flex-1 text-base sm:text-lg py-4"
+                  >
+                    Sign Up Free
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => navigate("/signin")}
+                    className="flex-1 text-base sm:text-lg py-4"
+                  >
+                    Sign In
+                  </Button>
+                </div>
+
+                <p className="text-xs sm:text-sm text-muted-foreground text-center mt-6">
+                  No credit card required • Free forever
+                </p>
+              </div>
+            </div>
+          ) : !result ? (
+            /* Analysis Form for Authenticated Users */
             <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden">
               {/* Colored Header Section */}
-              <div className="bg-gradient-to-br from-primary to-primary-hover p-8">
-                <h2 className="text-3xl font-bold text-foreground mb-2">
+              <div className="bg-gradient-to-br from-primary to-primary-hover p-4 sm:p-6 md:p-8">
+                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
                   Quick Resume Analysis
                 </h2>
-                <p className="text-foreground/80 text-lg">
+                <p className="text-foreground/80 text-base sm:text-lg">
                   Upload your resume and paste a job description to get instant
                   AI-powered feedback
                 </p>
               </div>
 
               {/* White Content Section */}
-              <div className="p-8 bg-white">
+              <div className="p-4 sm:p-6 md:p-8 bg-white">
                 {/* Error Display */}
                 {error && (
                   <Alert status="error" className="mb-6">
@@ -375,10 +565,10 @@ export default function Home() {
                   </div>
 
                   {/* Submit Button */}
-                  <Button type="submit" disabled={isPending} className="w-full">
+                  <Button type="submit" disabled={isPending} className="w-full text-base sm:text-lg py-3 sm:py-4">
                     {isPending ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
                         Analyzing...
                       </>
                     ) : (
