@@ -223,3 +223,23 @@ export interface CoverLetterGenerateFromTemplateRequest {
   company_name?: string;
   tags?: string[];
 }
+
+// Job Parser Types
+export interface JobParseRequest {
+  source_type: 'text' | 'url';
+  content: string;
+}
+
+export interface ParsedJobData {
+  job_title: string | null;
+  company_name: string | null;
+  location: string | null;
+  key_skills: string[];
+  responsibilities: string[];
+  qualifications: string[];
+  nice_to_have: string[];
+  tone: 'professional' | 'enthusiastic' | 'balanced';
+  experience_level: 'junior' | 'mid' | 'senior' | 'lead' | null;
+  raw_text: string;
+  source_url?: string;
+}

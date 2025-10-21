@@ -17,6 +17,7 @@ import type {
   CoverLetterTemplateCreateRequest,
   CoverLetterTemplateUpdateRequest,
   CoverLetterGenerateFromTemplateRequest,
+  ParsedJobData,
 } from '@/types/api';
 
 export const analyzeResume = async (data: AnalysisRequest): Promise<AnalysisResponse> => {
@@ -266,4 +267,16 @@ export const generateCoverLetterFromTemplate = async (data: CoverLetterGenerateF
     length: template.length,
     tags: data.tags,
   });
+};
+
+// Job Parser API functions
+export const parseJobDescription = async (
+  sourceType: 'text' | 'url',
+  content: string
+): Promise<ParsedJobData> => {
+  const response = await apiClient.post<ParsedJobData>('/api/job-parser/parse', {
+    source_type: sourceType,
+    content,
+  });
+  return response.data;
 };
