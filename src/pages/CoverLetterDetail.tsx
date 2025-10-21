@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import DOMPurify from 'dompurify';
 import {
   ArrowLeft,
   Edit3,
@@ -21,9 +22,9 @@ import {
   BookTemplate,
 } from 'lucide-react';
 import { Button } from '@/components/retroui/Button';
-import { Textarea } from '@/components/retroui/Textarea';
 import { Badge } from '@/components/retroui/Badge';
 import { RefineModal } from '@/components/cover-letter/RefineModal';
+import { RichTextEditor } from '@/components/cover-letter/RichTextEditor';
 import { getCoverLetterById, exportCoverLetter, createTemplate, getTemplateCategories } from '@/lib/api';
 import { useUpdateCoverLetter } from '@/hooks/useUpdateCoverLetter';
 import { useDeleteCoverLetter } from '@/hooks/useDeleteCoverLetter';
@@ -241,11 +242,10 @@ export const CoverLetterDetail = () => {
             <div className="p-6 bg-white">
               {isEditing ? (
                 <>
-                  <Textarea
-                    value={editedText}
-                    onChange={(e) => setEditedText(e.target.value)}
-                    rows={20}
-                    className="w-full resize-none font-mono text-sm"
+                  <RichTextEditor
+                    content={editedText}
+                    onChange={setEditedText}
+                    placeholder="Edit your cover letter..."
                   />
                   <div className="flex gap-3 mt-4">
                     <Button onClick={handleSave} disabled={isUpdating} className="flex-1">
@@ -269,9 +269,12 @@ export const CoverLetterDetail = () => {
                 </>
               ) : (
                 <>
-                  <div className="prose max-w-none whitespace-pre-wrap text-foreground">
-                    {coverLetter.cover_letter_text}
-                  </div>
+                  <div
+                    className="prose max-w-none text-foreground"
+                    dangerouslySetInnerHTML={{
+                      __html: DOMPurify.sanitize(coverLetter.cover_letter_text),
+                    }}
+                  />
                   <div className="flex gap-3 mt-6 pt-6 border-t-2 border-black">
                     <Button variant="outline" onClick={handleEdit} className="flex-1">
                       <Edit3 className="mr-2 h-4 w-4" />
