@@ -88,18 +88,18 @@ export const ResumeCard = ({ resume, onDelete, isDeleting = false }: ResumeCardP
         resume.file_type.toLowerCase() === 'pdf'
           ? 'bg-gradient-to-br from-red-500 to-red-600'
           : 'bg-gradient-to-br from-blue-500 to-blue-600'
-      } p-4`}>
-        <div className="flex items-start justify-between">
+      } p-3 sm:p-4`}>
+        <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
-              <FileText className="h-5 w-5 text-white flex-shrink-0" />
-              <h3 className="text-lg font-bold text-white truncate">{resume.file_name}</h3>
+              <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-white flex-shrink-0" />
+              <h3 className="text-base sm:text-lg font-bold text-white truncate">{resume.file_name}</h3>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <Badge variant="solid" className={getFileTypeBadgeColor(resume.file_type)}>
                 {resume.file_type.toUpperCase()}
               </Badge>
-              <span className="text-sm text-white/80">{formatFileSize(resume.file_size)}</span>
+              <span className="text-xs sm:text-sm text-white/80">{formatFileSize(resume.file_size)}</span>
             </div>
           </div>
           <Button
@@ -107,41 +107,34 @@ export const ResumeCard = ({ resume, onDelete, isDeleting = false }: ResumeCardP
             size="sm"
             onClick={handleDelete}
             disabled={isDeleting}
-            className="!bg-white hover:!bg-red-50 !border-red-500 !text-red-600 hover:!text-red-700 flex-shrink-0 ml-2"
+            className="!bg-white hover:!bg-red-50 !border-red-500 !text-red-600 hover:!text-red-700 flex-shrink-0"
           >
             {showDeleteConfirm ? (
-              'Confirm?'
+              <span className="text-xs">Confirm?</span>
             ) : (
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             )}
           </Button>
         </div>
       </div>
 
       {/* White Content Section */}
-      <div className="p-4 bg-white space-y-4">
-        {/* Parsed Text Preview */}
-        {resume.parsed_text && (
-          <div className="text-sm text-muted-foreground line-clamp-2">
-            {resume.parsed_text.substring(0, 100)}...
-          </div>
-        )}
-
+      <div className="p-3 sm:p-4 bg-white space-y-3">
         {/* Date */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground border-t pt-3">
-          <Calendar className="h-4 w-4" />
+        <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+          <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           <span>{formatDate(resume.created_at)}</span>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2 pt-2">
+        <div className={`flex gap-2 ${resume.storage_backend === 'r2' ? 'flex-col' : ''}`}>
           {resume.storage_backend === 'r2' && (
             <Button
               variant="secondary"
               size="sm"
               onClick={handleDownload}
               disabled={isDownloading}
-              className="flex-1"
+              className="w-full"
             >
               <Download className="h-4 w-4 mr-2" />
               {isDownloading ? 'Downloading...' : 'Download'}
@@ -150,7 +143,7 @@ export const ResumeCard = ({ resume, onDelete, isDeleting = false }: ResumeCardP
           <Button
             size="sm"
             onClick={handleUseForAnalysis}
-            className="flex-1"
+            className="w-full"
           >
             <Play className="h-4 w-4 mr-2" />
             Use for Analysis
