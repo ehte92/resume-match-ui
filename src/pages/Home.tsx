@@ -346,10 +346,6 @@ export default function Home() {
                     Sign In
                   </Button>
                 </div>
-
-                <p className="text-xs sm:text-sm text-muted-foreground text-center mt-6">
-                  No credit card required • Free forever
-                </p>
               </div>
             </div>
           ) : !result ? (
