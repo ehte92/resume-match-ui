@@ -52,8 +52,8 @@ export const ResumeCard = ({ resume, onDelete, isDeleting = false }: ResumeCardP
 
   const handleUseForAnalysis = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // Navigate to home page with resume ID in state
-    navigate('/', { state: { resumeId: resume.id } });
+    // Navigate to new analysis page with resume ID in state
+    navigate('/new-analysis', { state: { resumeId: resume.id } });
     toast.info(`Selected ${resume.file_name} for analysis`);
   };
 

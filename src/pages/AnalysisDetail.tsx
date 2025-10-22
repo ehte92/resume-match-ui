@@ -48,8 +48,8 @@ export const AnalysisDetail = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Skeleton className="w-40 h-10 mb-6" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+          <Skeleton className="w-40 h-10 mb-4 sm:mb-6" />
           <SkeletonCard />
         </div>
       </div>
@@ -59,11 +59,12 @@ export const AnalysisDetail = () => {
   if (error || !analysis) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           <Button
             variant="outline"
+            size="sm"
             onClick={() => navigate("/dashboard")}
-            className="mb-6"
+            className="mb-4 sm:mb-6"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
@@ -82,12 +83,13 @@ export const AnalysisDetail = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Back Button */}
         <Button
           variant="outline"
+          size="sm"
           onClick={() => navigate("/dashboard")}
-          className="mb-6"
+          className="mb-4 sm:mb-6"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Dashboard
@@ -96,35 +98,35 @@ export const AnalysisDetail = () => {
         {/* Analysis Results */}
         <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden">
           {/* Colored Header Section */}
-          <div className="bg-gradient-to-br from-primary to-primary-hover p-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-3xl font-bold text-foreground">
+          <div className="bg-gradient-to-br from-primary to-primary-hover p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3 sm:mb-4">
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
                 Analysis Results
               </h2>
               <ExportButton analysis={analysis} variant="secondary" />
             </div>
 
             {/* Job Info */}
-            <div className="space-y-2">
+            <div className="space-y-1.5 sm:space-y-2">
               {analysis.job_title && (
                 <div className="flex items-center gap-2">
-                  <Briefcase className="h-5 w-5 text-foreground" />
-                  <span className="text-lg text-foreground font-medium">
+                  <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 text-foreground" />
+                  <span className="text-base sm:text-lg text-foreground font-medium">
                     {analysis.job_title}
                   </span>
                 </div>
               )}
               {analysis.company_name && (
                 <div className="flex items-center gap-2">
-                  <Building2 className="h-5 w-5 text-foreground/80" />
-                  <span className="text-foreground/80">
+                  <Building2 className="h-4 w-4 sm:h-5 sm:w-5 text-foreground/80" />
+                  <span className="text-sm sm:text-base text-foreground/80">
                     {analysis.company_name}
                   </span>
                 </div>
               )}
               <div className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-foreground/80" />
-                <span className="text-foreground/80">
+                <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-foreground/80" />
+                <span className="text-xs sm:text-sm text-foreground/80">
                   {formatDate(analysis.created_at)}
                 </span>
               </div>
@@ -132,9 +134,9 @@ export const AnalysisDetail = () => {
           </div>
 
           {/* White Content Section */}
-          <div className="p-8 bg-white space-y-8">
+          <div className="p-4 sm:p-6 bg-white space-y-6">
             {/* Scores Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
               <ScoreCard
                 title="Match Score"
                 score={Number(analysis.match_score) || 0}
@@ -174,8 +176,8 @@ export const AnalysisDetail = () => {
                   }
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="border-2 border-black rounded p-4 shadow-md">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="border-2 border-black rounded p-3 sm:p-4 shadow-md">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
                         <CheckCircle className="h-5 w-5 text-green-600" />
@@ -211,7 +213,7 @@ export const AnalysisDetail = () => {
                     </div>
                   </div>
 
-                  <div className="border-2 border-black rounded p-4 shadow-md">
+                  <div className="border-2 border-black rounded p-3 sm:p-4 shadow-md">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
                         <XCircle className="h-5 w-5 text-red-600" />
@@ -400,27 +402,27 @@ export const AnalysisDetail = () => {
             </CollapsibleSection>
 
             {/* Processing Time */}
-            <div className="text-sm text-muted-foreground border-t pt-4">
+            <div className="text-xs sm:text-sm text-muted-foreground border-t pt-4">
               Analysis completed in{" "}
               {(analysis.processing_time_ms / 1000).toFixed(2)} seconds
               {analysis.openai_tokens_used && (
-                <span className="ml-4">
+                <span className="ml-2 sm:ml-4">
                   • {analysis.openai_tokens_used} AI tokens used
                 </span>
               )}
             </div>
 
             {/* Actions */}
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <Button onClick={() => navigate("/")} className="w-full sm:flex-1">
+                Analyze Another Resume
+              </Button>
               <Button
                 onClick={() => navigate("/dashboard")}
                 variant="secondary"
-                className="flex-1"
+                className="w-full sm:flex-1"
               >
                 Back to Dashboard
-              </Button>
-              <Button onClick={() => navigate("/")} className="flex-1">
-                Analyze Another Resume
               </Button>
             </div>
           </div>
