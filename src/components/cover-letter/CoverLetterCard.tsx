@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
 import { FileText, Briefcase, Building2, Eye, Trash2, Copy, Calendar, Tag } from 'lucide-react';
+import DOMPurify from 'dompurify';
 import { Badge } from '@/components/retroui/Badge';
 import { Button } from '@/components/retroui/Button';
 import type { CoverLetterResponse } from '@/types/api';
@@ -11,6 +12,24 @@ interface CoverLetterCardProps {
   onDelete: (id: string) => void;
   isDeleting: boolean;
 }
+
+// Helper function to strip HTML tags and get plain text preview
+const stripHtmlAndTruncate = (html: string, maxLength: number): string => {
+  // Create a temporary div to parse HTML
+  const temp = document.createElement('div');
+  temp.innerHTML = DOMPurify.sanitize(html);
+
+  // Get plain text content
+  const plainText = temp.textContent || temp.innerText || '';
+
+  // Trim and truncate
+  const trimmed = plainText.trim();
+  if (trimmed.length <= maxLength) {
+    return trimmed;
+  }
+
+  return trimmed.substring(0, maxLength) + '...';
+};
 
 export const CoverLetterCard = ({ coverLetter, onDelete, isDeleting }: CoverLetterCardProps) => {
   const navigate = useNavigate();
@@ -30,7 +49,11 @@ export const CoverLetterCard = ({ coverLetter, onDelete, isDeleting }: CoverLett
 
   const handleCopy = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    await navigator.clipboard.writeText(coverLetter.cover_letter_text);
+    // Strip HTML tags for plain text copy
+    const temp = document.createElement('div');
+    temp.innerHTML = DOMPurify.sanitize(coverLetter.cover_letter_text);
+    const plainText = temp.textContent || temp.innerText || '';
+    await navigator.clipboard.writeText(plainText);
     toast.success('Cover letter copied to clipboard');
   };
 
@@ -43,30 +66,30 @@ export const CoverLetterCard = ({ coverLetter, onDelete, isDeleting }: CoverLett
 
   return (
     <div className="border-2 border-black bg-white shadow-md rounded overflow-hidden hover:shadow-xl transition-shadow cursor-pointer">
-      <div onClick={() => navigate(`/cover-letters/${coverLetter.id}`)} className="p-5">
-        <div className="flex items-start justify-between mb-3">
+      <div onClick={() => navigate(`/cover-letters/${coverLetter.id}`)} className="p-3 sm:p-4">
+        <div className="flex items-start justify-between mb-2 sm:mb-3">
           <div className="flex-1">
             {coverLetter.job_title && (
               <div className="flex items-center gap-2 mb-1">
-                <Briefcase className="h-4 w-4 text-primary" />
-                <h3 className="font-bold text-foreground">{coverLetter.job_title}</h3>
+                <Briefcase className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
+                <h3 className="font-bold text-foreground text-sm sm:text-base">{coverLetter.job_title}</h3>
               </div>
             )}
             {coverLetter.company_name && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Building2 className="h-3.5 w-3.5" />
+              <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+                <Building2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                 <span>{coverLetter.company_name}</span>
               </div>
             )}
           </div>
-          <FileText className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+          <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground flex-shrink-0" />
         </div>
 
-        <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
-          {coverLetter.cover_letter_text.substring(0, 150)}...
+        <p className="text-xs sm:text-sm text-muted-foreground line-clamp-3 mb-3">
+          {stripHtmlAndTruncate(coverLetter.cover_letter_text, 150)}
         </p>
 
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3">
           <Badge variant="solid" className={getToneBadgeColor(coverLetter.tone)}>
             {coverLetter.tone}
           </Badge>
@@ -80,7 +103,7 @@ export const CoverLetterCard = ({ coverLetter, onDelete, isDeleting }: CoverLett
 
         {/* Tags Section */}
         {coverLetter.tags && coverLetter.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-3">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2">
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <Tag className="h-3 w-3" />
             </div>
@@ -97,13 +120,13 @@ export const CoverLetterCard = ({ coverLetter, onDelete, isDeleting }: CoverLett
           </div>
         )}
 
-        <div className="flex items-center text-xs text-muted-foreground mb-3">
+        <div className="flex items-center text-xs text-muted-foreground">
           <Calendar className="h-3 w-3 mr-1" />
           {new Date(coverLetter.created_at).toLocaleDateString()}
         </div>
       </div>
 
-      <div className="border-t-2 border-black bg-background px-5 py-3 flex gap-2">
+      <div className="border-t-2 border-black bg-background px-3 py-2 sm:px-4 sm:py-2.5 flex gap-2">
         <Button
           size="sm"
           variant="outline"

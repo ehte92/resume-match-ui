@@ -207,39 +207,39 @@ export const CoverLetterDetail = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Header */}
-        <div className="mb-6">
-          <Button variant="outline" onClick={() => navigate('/cover-letters')} className="mb-4">
+        <div className="mb-4 sm:mb-6">
+          <Button variant="outline" size="sm" onClick={() => navigate('/cover-letters')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Cover Letters
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 border-2 border-black bg-white shadow-xl rounded overflow-hidden">
-            <div className="bg-gradient-to-br from-primary to-primary-hover p-6 border-b-2 border-black">
+            <div className="bg-gradient-to-br from-primary to-primary-hover p-4 sm:p-6 border-b-2 border-black">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   {coverLetter.job_title && (
                     <div className="flex items-center gap-2 mb-2">
-                      <Briefcase className="h-5 w-5" />
-                      <h1 className="text-2xl font-bold">{coverLetter.job_title}</h1>
+                      <Briefcase className="h-4 w-4 sm:h-5 sm:w-5" />
+                      <h1 className="text-xl sm:text-2xl font-bold">{coverLetter.job_title}</h1>
                     </div>
                   )}
                   {coverLetter.company_name && (
-                    <div className="flex items-center gap-2 text-foreground/80">
-                      <Building2 className="h-4 w-4" />
+                    <div className="flex items-center gap-2 text-foreground/80 text-sm sm:text-base">
+                      <Building2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       <span>{coverLetter.company_name}</span>
                     </div>
                   )}
                 </div>
-                <FileText className="h-6 w-6" />
+                <FileText className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
             </div>
 
-            <div className="p-6 bg-white">
+            <div className="p-4 sm:p-6 bg-white">
               {isEditing ? (
                 <>
                   <RichTextEditor
@@ -275,81 +275,89 @@ export const CoverLetterDetail = () => {
                       __html: DOMPurify.sanitize(coverLetter.cover_letter_text),
                     }}
                   />
-                  <div className="flex gap-3 mt-6 pt-6 border-t-2 border-black">
-                    <Button variant="outline" onClick={handleEdit} className="flex-1">
-                      <Edit3 className="mr-2 h-4 w-4" />
-                      Edit
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsRefineModalOpen(true)}
-                      className="flex-1 border-purple-500 text-purple-700 hover:bg-purple-50"
-                    >
-                      <Sparkles className="mr-2 h-4 w-4" />
-                      Refine with AI
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsSaveTemplateModalOpen(true)}
-                      className="flex-1 border-blue-500 text-blue-700 hover:bg-blue-50"
-                    >
-                      <BookTemplate className="mr-2 h-4 w-4" />
-                      Save as Template
-                    </Button>
-                    <Button variant="outline" onClick={handleCopy}>
-                      <Copy className="h-4 w-4" />
-                    </Button>
-
-                    {/* Export Dropdown */}
-                    <div className="relative" ref={exportDropdownRef}>
+                  <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t-2 border-black space-y-3">
+                    {/* Row 1: Edit and Refine */}
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                      <Button variant="outline" onClick={handleEdit} className="w-full sm:flex-1">
+                        <Edit3 className="mr-2 h-4 w-4" />
+                        Edit
+                      </Button>
                       <Button
-                        ref={exportButtonRef}
                         variant="outline"
-                        onClick={() => {
-                          calculateDropdownPosition();
-                          setIsExportDropdownOpen(!isExportDropdownOpen);
-                        }}
-                        disabled={isExporting}
-                        className="gap-1"
+                        onClick={() => setIsRefineModalOpen(true)}
+                        className="w-full sm:flex-1 border-purple-500 text-purple-700 hover:bg-purple-50"
                       >
-                        {isExporting ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <>
-                            <Download className="h-4 w-4" />
-                            <ChevronDown className="h-3 w-3" />
-                          </>
-                        )}
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        Refine with AI
+                      </Button>
+                    </div>
+
+                    {/* Row 2: Save as Template, Copy, Export */}
+                    <div className="flex gap-2 sm:gap-3">
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsSaveTemplateModalOpen(true)}
+                        className="flex-1 border-blue-500 text-blue-700 hover:bg-blue-50"
+                      >
+                        <BookTemplate className="mr-2 h-4 w-4" />
+                        <span className="hidden sm:inline">Save as Template</span>
+                        <span className="sm:hidden">Template</span>
+                      </Button>
+                      <Button variant="outline" onClick={handleCopy}>
+                        <Copy className="h-4 w-4" />
                       </Button>
 
-                      {/* Dropdown Menu */}
-                      {isExportDropdownOpen && (
-                        <div className={`absolute right-0 w-48 bg-white border-2 border-black shadow-[4px_4px_0_0_#000] rounded overflow-hidden z-10 ${
-                          dropdownPosition === 'top' ? 'bottom-full mb-2' : 'mt-2'
-                        }`}>
-                          <button
-                            onClick={() => handleExport('pdf')}
-                            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors flex items-center gap-2"
-                          >
-                            <FileText className="h-4 w-4" />
-                            Download as PDF
-                          </button>
-                          <button
-                            onClick={() => handleExport('docx')}
-                            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors flex items-center gap-2 border-t border-gray-200"
-                          >
-                            <FileText className="h-4 w-4" />
-                            Download as DOCX
-                          </button>
-                          <button
-                            onClick={() => handleExport('txt')}
-                            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors flex items-center gap-2 border-t border-gray-200"
-                          >
-                            <FileText className="h-4 w-4" />
-                            Download as TXT
-                          </button>
-                        </div>
-                      )}
+                      {/* Export Dropdown */}
+                      <div className="relative" ref={exportDropdownRef}>
+                        <Button
+                          ref={exportButtonRef}
+                          variant="outline"
+                          onClick={() => {
+                            calculateDropdownPosition();
+                            setIsExportDropdownOpen(!isExportDropdownOpen);
+                          }}
+                          disabled={isExporting}
+                          className="gap-1"
+                        >
+                          {isExporting ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <>
+                              <Download className="h-4 w-4" />
+                              <ChevronDown className="h-3 w-3" />
+                            </>
+                          )}
+                        </Button>
+
+                        {/* Dropdown Menu */}
+                        {isExportDropdownOpen && (
+                          <div className={`absolute right-0 w-48 bg-white border-2 border-black shadow-[4px_4px_0_0_#000] rounded overflow-hidden z-10 ${
+                            dropdownPosition === 'top' ? 'bottom-full mb-2' : 'mt-2'
+                          }`}>
+                            <button
+                              onClick={() => handleExport('pdf')}
+                              className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors flex items-center gap-2"
+                            >
+                              <FileText className="h-4 w-4" />
+                              Download as PDF
+                            </button>
+                            <button
+                              onClick={() => handleExport('docx')}
+                              className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors flex items-center gap-2 border-t border-gray-200"
+                            >
+                              <FileText className="h-4 w-4" />
+                              Download as DOCX
+                            </button>
+                            <button
+                              onClick={() => handleExport('txt')}
+                              className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors flex items-center gap-2 border-t border-gray-200"
+                            >
+                              <FileText className="h-4 w-4" />
+                              Download as TXT
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </>
@@ -358,13 +366,13 @@ export const CoverLetterDetail = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Metadata Card */}
             <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden">
-              <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-4 border-b-2 border-black">
-                <h3 className="font-bold text-white">Details</h3>
+              <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-3 sm:p-4 border-b-2 border-black">
+                <h3 className="font-bold text-white text-sm sm:text-base">Details</h3>
               </div>
-              <div className="p-4 space-y-4">
+              <div className="p-3 sm:p-4 space-y-3 sm:space-y-4">
                 <div>
                   <p className="text-xs font-medium text-muted-foreground mb-1">Tone & Length</p>
                   <div className="flex gap-2">
@@ -415,10 +423,10 @@ export const CoverLetterDetail = () => {
 
             {/* Actions Card */}
             <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden">
-              <div className="bg-gradient-to-br from-red-500 to-red-600 p-4 border-b-2 border-black">
-                <h3 className="font-bold text-white">Danger Zone</h3>
+              <div className="bg-gradient-to-br from-red-500 to-red-600 p-3 sm:p-4 border-b-2 border-black">
+                <h3 className="font-bold text-white text-sm sm:text-base">Danger Zone</h3>
               </div>
-              <div className="p-4">
+              <div className="p-3 sm:p-4">
                 <Button
                   variant="outline"
                   onClick={handleDelete}

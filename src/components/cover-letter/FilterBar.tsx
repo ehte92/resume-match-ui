@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, X, Tag as TagIcon, Filter, ChevronDown } from 'lucide-react';
-import { Input } from '@/components/retroui/Input';
+import { X, Tag as TagIcon, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/retroui/Button';
 import { Badge } from '@/components/retroui/Badge';
 import { getAvailableTags } from '@/lib/api';
@@ -29,10 +28,6 @@ export const FilterBar = ({ filters, onFiltersChange }: FilterBarProps) => {
       .then(setAvailableTags)
       .catch((error) => console.error('Failed to load tags:', error));
   }, []);
-
-  const handleSearchChange = (value: string) => {
-    onFiltersChange({ ...filters, search: value });
-  };
 
   const toggleTag = (tag: string) => {
     const newTags = filters.tags.includes(tag)
@@ -69,43 +64,24 @@ export const FilterBar = ({ filters, onFiltersChange }: FilterBarProps) => {
     setShowTagsDropdown(false);
   };
 
-  const hasActiveFilters = filters.search || filters.tags.length > 0 || filters.tone || filters.length;
+  const hasActiveFilters = filters.tags.length > 0 || filters.tone || filters.length;
 
   return (
-    <div className="bg-white border-2 border-black shadow-md rounded p-4 mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Filter className="h-5 w-5" />
-          <h3 className="font-bold">Filters</h3>
-        </div>
-        {hasActiveFilters && (
+    <div className="space-y-3 sm:space-y-4">
+      {hasActiveFilters && (
+        <div className="flex items-center justify-end">
           <Button variant="outline" size="sm" onClick={clearFilters}>
-            <X className="h-3.5 w-3.5 mr-1" />
-            Clear All
+            <X className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-2" />
+            Clear
           </Button>
-        )}
-      </div>
-
-      <div className="space-y-4">
-        {/* Search */}
-        <div>
-          <label className="text-sm font-medium mb-2 block">Search</label>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by job title, company, or content..."
-              value={filters.search}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="pl-10"
-            />
-          </div>
         </div>
+      )}
 
         {/* Tags Filter */}
         {availableTags && (
           <div>
-            <label className="text-sm font-medium mb-2 block flex items-center gap-2">
-              <TagIcon className="h-4 w-4" />
+            <label className="text-xs sm:text-sm font-medium mb-2 block flex items-center gap-2">
+              <TagIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               Tags
             </label>
             <div>
@@ -168,9 +144,9 @@ export const FilterBar = ({ filters, onFiltersChange }: FilterBarProps) => {
         )}
 
         {/* Tone and Length Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div>
-            <label className="text-sm font-medium mb-2 block">Tone</label>
+            <label className="text-xs sm:text-sm font-medium mb-2 block">Tone</label>
             <div className="flex gap-2">
               {(['professional', 'enthusiastic', 'balanced'] as const).map((tone) => (
                 <Badge
@@ -190,7 +166,7 @@ export const FilterBar = ({ filters, onFiltersChange }: FilterBarProps) => {
           </div>
 
           <div>
-            <label className="text-sm font-medium mb-2 block">Length</label>
+            <label className="text-xs sm:text-sm font-medium mb-2 block">Length</label>
             <div className="flex gap-2">
               {(['short', 'medium', 'long'] as const).map((length) => (
                 <Badge
@@ -210,33 +186,32 @@ export const FilterBar = ({ filters, onFiltersChange }: FilterBarProps) => {
           </div>
         </div>
 
-        {/* Sort Options */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm font-medium mb-2 block">Sort By</label>
-            <select
-              value={filters.sortBy}
-              onChange={(e) => handleSortChange(e.target.value)}
-              className="w-full border-2 border-black rounded px-3 py-2 text-sm bg-white"
-            >
-              <option value="created_at">Date Created</option>
-              <option value="word_count">Word Count</option>
-              <option value="job_title">Job Title</option>
-              <option value="company_name">Company Name</option>
-            </select>
-          </div>
+      {/* Sort Options */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+        <div>
+          <label className="text-xs sm:text-sm font-medium mb-2 block">Sort By</label>
+          <select
+            value={filters.sortBy}
+            onChange={(e) => handleSortChange(e.target.value)}
+            className="w-full border-2 border-black rounded px-3 py-2 text-sm bg-white"
+          >
+            <option value="created_at">Date Created</option>
+            <option value="word_count">Word Count</option>
+            <option value="job_title">Job Title</option>
+            <option value="company_name">Company Name</option>
+          </select>
+        </div>
 
-          <div>
-            <label className="text-sm font-medium mb-2 block">Order</label>
-            <select
-              value={filters.sortOrder}
-              onChange={(e) => handleSortChange(filters.sortBy, e.target.value)}
-              className="w-full border-2 border-black rounded px-3 py-2 text-sm bg-white"
-            >
-              <option value="desc">Descending</option>
-              <option value="asc">Ascending</option>
-            </select>
-          </div>
+        <div>
+          <label className="text-xs sm:text-sm font-medium mb-2 block">Order</label>
+          <select
+            value={filters.sortOrder}
+            onChange={(e) => handleSortChange(filters.sortBy, e.target.value)}
+            className="w-full border-2 border-black rounded px-3 py-2 text-sm bg-white"
+          >
+            <option value="desc">Descending</option>
+            <option value="asc">Ascending</option>
+          </select>
         </div>
       </div>
     </div>
