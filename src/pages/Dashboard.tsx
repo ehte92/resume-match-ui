@@ -9,7 +9,7 @@ import { AnalysisCard } from '@/components/analysis/AnalysisCard';
 import { SkeletonList } from '@/components/retroui/Skeleton';
 import { useAnalysisHistory, useDeleteAnalysis } from '@/hooks/useAnalysisHistory';
 import { useResumes } from '@/hooks/useResumes';
-import { ChevronLeft, ChevronRight, Search, SlidersHorizontal, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, SlidersHorizontal, X, Plus, FolderOpen } from 'lucide-react';
 import type { AnalysisResponse } from '@/types/api';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
@@ -100,135 +100,110 @@ export const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">
-            Welcome back, {user?.full_name || user?.email}!
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+            Welcome back, {user?.full_name?.split(' ')[0] || 'there'}
           </h1>
-          <p className="mt-2 text-muted-foreground">
-            Ready to optimize your resume for your next opportunity?
+          <p className="mt-1 text-sm sm:text-base text-muted-foreground">
+            Track your analyses and optimize your resume
           </p>
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden">
-            {/* Colored Header Section */}
-            <div className="bg-gradient-to-br from-primary to-primary-hover p-6">
-              <h3 className="text-xl font-bold text-foreground">New Analysis</h3>
-              <p className="text-foreground/80 text-sm mt-1">
-                Upload your resume and compare it with a job description
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden hover:shadow-2xl transition-shadow">
+            {/* Header Section */}
+            <div className="bg-primary p-4 sm:p-5 border-b-2 border-black">
+              <h3 className="text-lg sm:text-xl font-bold text-foreground">New Analysis</h3>
+              <p className="text-foreground/80 text-xs sm:text-sm mt-1">
+                Compare resume with job description
               </p>
             </div>
 
-            {/* White Content Section */}
-            <div className="p-6 bg-white">
+            {/* Content Section */}
+            <div className="p-4 sm:p-5 bg-white">
               <Button onClick={() => navigate('/new-analysis')} className="w-full">
-                Start New Analysis
+                <Plus className="h-4 w-4 mr-2" />
+                Start Analysis
               </Button>
             </div>
           </div>
 
-          <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden">
-            {/* Colored Header Section */}
-            <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-6">
-              <h3 className="text-xl font-bold text-foreground">Resume Library</h3>
-              <p className="text-foreground/80 text-sm mt-1">
+          <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden hover:shadow-2xl transition-shadow">
+            {/* Header Section */}
+            <div className="bg-blue-500 p-4 sm:p-5 border-b-2 border-black">
+              <h3 className="text-lg sm:text-xl font-bold text-foreground">Resume Library</h3>
+              <p className="text-foreground/80 text-xs sm:text-sm mt-1">
                 {resumeData?.total
-                  ? `${resumeData.total} resume${resumeData.total !== 1 ? 's' : ''} uploaded`
-                  : 'Manage your resumes'}
+                  ? `${resumeData.total} resume${resumeData.total !== 1 ? 's' : ''} stored`
+                  : 'Upload and manage resumes'}
               </p>
             </div>
 
-            {/* White Content Section */}
-            <div className="p-6 bg-white">
+            {/* Content Section */}
+            <div className="p-4 sm:p-5 bg-white">
               <Button onClick={() => navigate('/resumes')} variant="secondary" className="w-full">
-                Manage Resumes
+                <FolderOpen className="h-4 w-4 mr-2" />
+                View Resumes
               </Button>
-            </div>
-          </div>
-
-          <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden">
-            {/* Colored Header Section */}
-            <div className="bg-gradient-to-br from-primary to-primary-hover p-6">
-              <h3 className="text-xl font-bold text-foreground">Account Info</h3>
-              <p className="text-foreground/80 text-sm mt-1">Your account details</p>
-            </div>
-
-            {/* White Content Section */}
-            <div className="p-6 bg-white space-y-2">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Email</p>
-                <p className="text-foreground">{user?.email}</p>
-              </div>
-              {user?.full_name && (
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Name</p>
-                  <p className="text-foreground">{user.full_name}</p>
-                </div>
-              )}
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Member since</p>
-                <p className="text-foreground">
-                  {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
-                </p>
-              </div>
             </div>
           </div>
         </div>
 
         {/* Search and Filter Section */}
-        <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden mb-8">
-          <div className="p-6 bg-white">
+        <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden mb-6 sm:mb-8">
+          <div className="p-4 sm:p-6 bg-white">
             {/* Search Bar */}
-            <div className="flex gap-3 mb-4">
+            <div className="flex flex-col sm:flex-row gap-3 mb-4">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
                 <Input
                   type="text"
-                  placeholder="Search by job title, company, or description..."
+                  placeholder="Search analyses..."
                   value={searchQuery}
                   onChange={(e) => handleSearchChange(e.target.value)}
-                  className="pl-10"
+                  className="pl-9 sm:pl-10 text-sm"
                 />
               </div>
               <Button
                 variant={showFilters ? 'default' : 'outline'}
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex-shrink-0"
+                className="flex-shrink-0 w-full sm:w-auto"
+                size="sm"
               >
-                <SlidersHorizontal className="h-4 w-4 mr-2" />
-                Filters
+                <SlidersHorizontal className="h-4 w-4 sm:mr-2" />
+                <span className="sm:inline hidden">Filters</span>
               </Button>
             </div>
 
             {/* Filter Options (Collapsible) */}
             {showFilters && (
-              <div className="border-2 border-black rounded p-4 bg-background space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="border-2 border-black rounded p-3 sm:p-4 bg-background space-y-3 sm:space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {/* Sort By */}
                   <div>
-                    <Label htmlFor="sortBy" className="mb-2">
+                    <Label htmlFor="sortBy" className="mb-2 text-xs sm:text-sm">
                       Sort By
                     </Label>
                     <select
                       id="sortBy"
                       value={sortBy}
                       onChange={(e) => handleSortChange(e.target.value as SortOption)}
-                      className="w-full px-3 py-2 border-2 border-black rounded bg-white focus:outline-none focus:ring-2 focus:ring-primary"
+                      className="w-full px-3 py-2 text-sm border-2 border-black rounded bg-white focus:outline-none focus:ring-2 focus:ring-primary"
                     >
                       <option value="date-desc">Newest First</option>
                       <option value="date-asc">Oldest First</option>
-                      <option value="score-desc">Highest Score First</option>
-                      <option value="score-asc">Lowest Score First</option>
+                      <option value="score-desc">Highest Score</option>
+                      <option value="score-asc">Lowest Score</option>
                     </select>
                   </div>
 
                   {/* Minimum Score Filter */}
                   <div>
-                    <Label htmlFor="minScore" className="mb-2">
-                      Minimum Match Score ({minScore}%)
+                    <Label htmlFor="minScore" className="mb-2 text-xs sm:text-sm">
+                      Min Score ({minScore}%)
                     </Label>
                     <Input
                       id="minScore"
@@ -238,14 +213,15 @@ export const Dashboard = () => {
                       value={minScore}
                       onChange={(e) => handleMinScoreChange(e.target.value)}
                       placeholder="0"
+                      className="text-sm"
                     />
                   </div>
                 </div>
 
                 {/* Filter Actions */}
-                <div className="flex justify-between items-center border-t pt-4">
-                  <p className="text-sm text-muted-foreground">
-                    Showing {filteredAndSortedAnalyses.length} of {analysisData?.analyses.length || 0} analyses
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 border-t pt-3 sm:pt-4">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    {filteredAndSortedAnalyses.length} of {analysisData?.analyses.length || 0} analyses
                   </p>
                   <Button
                     variant="outline"
@@ -253,8 +229,8 @@ export const Dashboard = () => {
                     onClick={clearFilters}
                     disabled={!searchQuery && minScore === 0 && sortBy === 'date-desc'}
                   >
-                    <X className="h-4 w-4 mr-2" />
-                    Clear Filters
+                    <X className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    Clear
                   </Button>
                 </div>
               </div>
@@ -264,40 +240,40 @@ export const Dashboard = () => {
 
         {/* Past Analyses Section */}
         <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden">
-          {/* Colored Header Section */}
-          <div className="bg-gradient-to-br from-primary to-primary-hover p-6">
-            <h3 className="text-xl font-bold text-foreground">Recent Analyses</h3>
-            <p className="text-foreground/80 text-sm mt-1">
+          {/* Header Section */}
+          <div className="bg-primary p-4 sm:p-5 border-b-2 border-black">
+            <h3 className="text-lg sm:text-xl font-bold text-foreground">Recent Analyses</h3>
+            <p className="text-foreground/80 text-xs sm:text-sm mt-1">
               {filteredAndSortedAnalyses.length > 0
-                ? `${filteredAndSortedAnalyses.length} analysis${filteredAndSortedAnalyses.length !== 1 ? 'es' : ''} found`
-                : 'Your previous resume analyses'}
+                ? `${filteredAndSortedAnalyses.length} ${filteredAndSortedAnalyses.length === 1 ? 'result' : 'results'}`
+                : 'No analyses yet'}
             </p>
           </div>
 
-          {/* White Content Section */}
-          <div className="p-6 bg-white">
+          {/* Content Section */}
+          <div className="p-4 sm:p-6 bg-white">
             {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 <SkeletonList count={pageSize} variant="analysis" />
               </div>
             ) : error ? (
-              <div className="text-center py-12">
-                <p className="text-destructive mb-4">Failed to load analyses</p>
-                <Button variant="outline" onClick={() => window.location.reload()}>
+              <div className="text-center py-8 sm:py-12">
+                <p className="text-destructive mb-4 text-sm sm:text-base">Failed to load analyses</p>
+                <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
                   Retry
                 </Button>
               </div>
             ) : filteredAndSortedAnalyses.length > 0 ? (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
                   {filteredAndSortedAnalyses.map((analysis) => (
                     <AnalysisCard
                       key={analysis.id}
                       analysis={analysis}
                       onDelete={(id) => {
                         deleteAnalysis(id, {
-                          onSuccess: () => toast.success('Analysis deleted successfully'),
-                          onError: () => toast.error('Failed to delete analysis'),
+                          onSuccess: () => toast.success('Analysis deleted'),
+                          onError: () => toast.error('Failed to delete'),
                         });
                       }}
                       isDeleting={isDeleting}
@@ -310,44 +286,47 @@ export const Dashboard = () => {
                   <div className="flex items-center justify-between border-t pt-4">
                     <Button
                       variant="outline"
+                      size="sm"
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
                     >
-                      <ChevronLeft className="h-4 w-4 mr-2" />
-                      Previous
+                      <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+                      <span className="hidden sm:inline">Previous</span>
                     </Button>
 
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-xs sm:text-sm text-muted-foreground">
                       Page {currentPage} of {Math.ceil(analysisData.total / pageSize)}
                     </span>
 
                     <Button
                       variant="outline"
+                      size="sm"
                       onClick={() => setCurrentPage((p) => p + 1)}
                       disabled={currentPage >= Math.ceil(analysisData.total / pageSize)}
                     >
-                      Next
-                      <ChevronRight className="h-4 w-4 ml-2" />
+                      <span className="hidden sm:inline">Next</span>
+                      <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 sm:ml-2" />
                     </Button>
                   </div>
                 )}
               </>
             ) : (
-              <div className="text-center py-12 text-muted-foreground">
+              <div className="text-center py-8 sm:py-12 text-muted-foreground">
                 {searchQuery || minScore > 0 ? (
                   <>
-                    <p className="mb-4 text-lg">No analyses match your filters</p>
-                    <p className="mb-6 text-sm">Try adjusting your search or filter criteria</p>
-                    <Button variant="outline" onClick={clearFilters}>
+                    <p className="mb-3 sm:mb-4 text-base sm:text-lg font-medium">No analyses match your filters</p>
+                    <p className="mb-4 sm:mb-6 text-xs sm:text-sm">Try adjusting your search criteria</p>
+                    <Button variant="outline" size="sm" onClick={clearFilters}>
                       Clear Filters
                     </Button>
                   </>
                 ) : (
                   <>
-                    <p className="mb-4 text-lg">No analyses yet</p>
-                    <p className="mb-6 text-sm">Start analyzing your resume to see results here</p>
-                    <Button onClick={() => navigate('/new-analysis')}>
-                      Create your first analysis
+                    <p className="mb-3 sm:mb-4 text-base sm:text-lg font-medium">No analyses yet</p>
+                    <p className="mb-4 sm:mb-6 text-xs sm:text-sm">Start analyzing your resume</p>
+                    <Button size="sm" onClick={() => navigate('/new-analysis')}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Analysis
                     </Button>
                   </>
                 )}
