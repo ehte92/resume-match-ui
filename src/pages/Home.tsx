@@ -150,22 +150,22 @@ export default function Home() {
 
   return (
     <>
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary to-primary-hover text-primary-foreground/80 border-b-5 border-black py-12 sm:py-16 md:py-20 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 leading-tight">
-              Optimize Your Resume with AI
-            </h1>
-            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-primary-foreground mb-6 sm:mb-8 max-w-3xl mx-auto px-4">
-              Get instant feedback on how well your resume matches any job description
-            </p>
-            {!isAuthenticated && (
+      {/* Hero Section - Only for unauthenticated users */}
+      {!isAuthenticated && (
+        <section className="bg-gradient-to-br from-primary to-primary-hover text-primary-foreground/80 border-b-5 border-black py-8 sm:py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 leading-tight">
+                Optimize Your Resume with AI
+              </h1>
+              <p className="text-base sm:text-lg text-primary-foreground mb-6 max-w-2xl mx-auto">
+                Get instant feedback on how well your resume matches any job description
+              </p>
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
                 <Button
                   size="lg"
                   onClick={() => navigate("/signup")}
-                  className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4"
+                  className="w-full sm:w-auto"
                 >
                   Get Started
                 </Button>
@@ -173,15 +173,15 @@ export default function Home() {
                   variant="secondary"
                   size="lg"
                   onClick={() => navigate("/signin")}
-                  className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4"
+                  className="w-full sm:w-auto"
                 >
                   Sign In
                 </Button>
               </div>
-            )}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Features Section - Only for unauthenticated users */}
       {!isAuthenticated && (
@@ -351,19 +351,16 @@ export default function Home() {
           ) : !result ? (
             /* Analysis Form for Authenticated Users */
             <div className="border-2 border-black bg-white shadow-xl rounded overflow-hidden">
-              {/* Colored Header Section */}
-              <div className="bg-gradient-to-br from-primary to-primary-hover p-4 sm:p-6 md:p-8">
-                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
-                  Quick Resume Analysis
-                </h2>
-                <p className="text-foreground/80 text-base sm:text-lg">
-                  Upload your resume and paste a job description to get instant
-                  AI-powered feedback
+              {/* Header Section */}
+              <div className="bg-primary p-4 sm:p-5 border-b-2 border-black">
+                <h2 className="text-lg sm:text-xl font-bold text-foreground">New Analysis</h2>
+                <p className="text-foreground/80 text-xs sm:text-sm mt-1">
+                  Compare your resume against a job description
                 </p>
               </div>
 
-              {/* White Content Section */}
-              <div className="p-4 sm:p-6 md:p-8 bg-white">
+              {/* Content Section */}
+              <div className="p-4 sm:p-6 bg-white">
                 {/* Error Display */}
                 {error && (
                   <Alert status="error" className="mb-6">
@@ -372,17 +369,17 @@ export default function Home() {
                   </Alert>
                 )}
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                   {/* Resume Source Selection - Only show for authenticated users */}
                   {isAuthenticated && (
                     <div>
-                      <Label className="mb-3">Resume Source</Label>
+                      <Label className="mb-2 text-sm">Resume Source</Label>
                       <div className="flex border-2 border-black rounded overflow-hidden shadow-md">
                         <button
                           type="button"
                           onClick={() => handleModeChange("upload")}
                           className={`
-                            flex-1 px-4 py-3 font-medium transition-colors
+                            flex-1 px-3 py-2 text-sm font-medium transition-colors
                             ${
                               uploadMode === "upload"
                                 ? "bg-primary text-foreground"
@@ -390,7 +387,7 @@ export default function Home() {
                             }
                           `}
                         >
-                          <Upload className="inline-block h-4 w-4 mr-2" />
+                          <Upload className="inline-block h-3.5 w-3.5 mr-2" />
                           Upload New
                         </button>
                         <div className="w-0.5 bg-black"></div>
@@ -398,7 +395,7 @@ export default function Home() {
                           type="button"
                           onClick={() => handleModeChange("select")}
                           className={`
-                            flex-1 px-4 py-3 font-medium transition-colors
+                            flex-1 px-3 py-2 text-sm font-medium transition-colors
                             ${
                               uploadMode === "select"
                                 ? "bg-primary text-foreground"
@@ -406,7 +403,7 @@ export default function Home() {
                             }
                           `}
                         >
-                          <FileText className="inline-block h-4 w-4 mr-2" />
+                          <FileText className="inline-block h-3.5 w-3.5 mr-2" />
                           Select from Library
                         </button>
                       </div>
@@ -416,10 +413,10 @@ export default function Home() {
                   {/* File Upload - Shown when in upload mode or for non-authenticated users */}
                   {uploadMode === "upload" && (
                     <div>
-                      <Label htmlFor="resume" className="mb-2">
+                      <Label htmlFor="resume" className="mb-2 text-sm">
                         Upload Resume
                       </Label>
-                      <div className={`border-2 rounded p-8 text-center bg-background transition-all shadow-md cursor-pointer ${
+                      <div className={`border-2 rounded p-4 sm:p-6 text-center bg-background transition-all shadow-md cursor-pointer ${
                         errors.resume ? 'border-red-500 hover:border-red-600' : 'border-black hover:border-primary hover:shadow-lg'
                       }`}>
                         <Input
@@ -432,35 +429,29 @@ export default function Home() {
                         <label htmlFor="resume" className="cursor-pointer">
                           {selectedFileName && resumeFiles?.[0] ? (
                             <div className="text-primary">
-                              <FileText className="mx-auto h-12 w-12 mb-2" />
-                              <p className="font-medium">{selectedFileName}</p>
-                              <p className="text-sm text-muted-foreground mt-1">
-                                {formatFileSize(resumeFiles[0].size)} • Click to change file
+                              <FileText className="mx-auto h-8 w-8 mb-2" />
+                              <p className="font-medium text-sm">{selectedFileName}</p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {formatFileSize(resumeFiles[0].size)} • Click to change
                               </p>
                             </div>
                           ) : (
                             <div className="text-muted-foreground">
-                              <Upload className="mx-auto h-12 w-12 mb-2" />
-                              <p className="font-medium text-foreground">
-                                Drop your resume here or click to browse
+                              <Upload className="mx-auto h-8 w-8 mb-2" />
+                              <p className="font-medium text-foreground text-sm">
+                                Click to upload or drag & drop
                               </p>
-                              <p className="text-sm text-muted-foreground mt-1">
-                                PDF or DOCX • Maximum 5MB
+                              <p className="text-xs text-muted-foreground mt-1">
+                                PDF or DOCX (max 5MB)
                               </p>
                             </div>
                           )}
                         </label>
                       </div>
                       {errors.resume && (
-                        <p className="text-sm text-destructive mt-2 flex items-start gap-1">
-                          <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                        <p className="text-xs text-destructive mt-2 flex items-start gap-1">
+                          <AlertCircle className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
                           <span>{errors.resume.message as string}</span>
-                        </p>
-                      )}
-                      {!errors.resume && resumeFiles?.[0] && (
-                        <p className="text-sm text-green-600 mt-2 flex items-center gap-1">
-                          <CheckCircle className="h-4 w-4" />
-                          <span>File ready for upload</span>
                         </p>
                       )}
                     </div>
@@ -469,13 +460,13 @@ export default function Home() {
                   {/* Resume Selector - Shown when in select mode for authenticated users */}
                   {uploadMode === "select" && isAuthenticated && (
                     <div>
-                      <Label className="mb-2">Select from Your Library</Label>
+                      <Label className="mb-2 text-sm">Select from Your Library</Label>
                       <ResumeSelector
                         selectedResumeId={selectedResumeId}
                         onSelectResume={handleResumeSelect}
                       />
                       {errors.resumeId && (
-                        <p className="text-sm text-destructive mt-1">
+                        <p className="text-xs text-destructive mt-1">
                           {errors.resumeId.message as string}
                         </p>
                       )}
@@ -485,7 +476,7 @@ export default function Home() {
                   {/* Job Description */}
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <Label htmlFor="jobDescription">
+                      <Label htmlFor="jobDescription" className="text-sm">
                         Job Description
                       </Label>
                       <span className={`text-xs ${
@@ -498,70 +489,57 @@ export default function Home() {
                           : 'text-muted-foreground'
                       }`}>
                         {jobDescriptionLength.toLocaleString()} / 10,000
-                        {jobDescriptionLength < 50 && jobDescriptionLength > 0 && (
-                          <span className="ml-1">({50 - jobDescriptionLength} more needed)</span>
-                        )}
                       </span>
                     </div>
                     <Textarea
                       id="jobDescription"
-                      rows={8}
-                      placeholder="Paste the job description here... (minimum 50 characters)"
+                      rows={6}
+                      placeholder="Paste job description (min 50 chars)"
                       {...register("jobDescription")}
-                      className={`resize-none ${
+                      className={`resize-none text-sm ${
                         errors.jobDescription ? 'border-red-500 focus:border-red-600' : ''
                       }`}
                     />
                     {errors.jobDescription && (
-                      <p className="text-sm text-destructive mt-2 flex items-start gap-1">
-                        <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                      <p className="text-xs text-destructive mt-2 flex items-start gap-1">
+                        <AlertCircle className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
                         <span>{errors.jobDescription.message}</span>
-                      </p>
-                    )}
-                    {!errors.jobDescription && jobDescriptionLength >= 50 && jobDescriptionLength <= 10000 && (
-                      <p className="text-sm text-green-600 mt-2 flex items-center gap-1">
-                        <CheckCircle className="h-4 w-4" />
-                        <span>Job description looks good</span>
                       </p>
                     )}
                   </div>
 
                   {/* Optional: Job Title */}
                   <div>
-                    <Label htmlFor="jobTitle" className="mb-2">
+                    <Label htmlFor="jobTitle" className="mb-2 text-sm">
                       Job Title{" "}
-                      <span className="text-sm text-muted-foreground">(Optional)</span>
+                      <span className="text-muted-foreground">(Optional)</span>
                     </Label>
                     <Input
                       id="jobTitle"
                       type="text"
                       placeholder="e.g., Senior Software Engineer"
                       {...register("jobTitle")}
+                      className="text-sm"
                     />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Helps organize your analysis history
-                    </p>
                   </div>
 
                   {/* Optional: Company Name */}
                   <div>
-                    <Label htmlFor="companyName" className="mb-2">
+                    <Label htmlFor="companyName" className="mb-2 text-sm">
                       Company Name{" "}
-                      <span className="text-sm text-muted-foreground">(Optional)</span>
+                      <span className="text-muted-foreground">(Optional)</span>
                     </Label>
                     <Input
                       id="companyName"
                       type="text"
-                      placeholder="e.g., Tech Corp Inc."
+                      placeholder="e.g., Google"
                       {...register("companyName")}
+                      className="text-sm"
                     />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Makes it easier to track applications
-                    </p>
                   </div>
 
                   {/* Submit Button */}
-                  <Button type="submit" disabled={isPending} className="w-full text-base sm:text-lg py-3 sm:py-4">
+                  <Button type="submit" disabled={isPending} className="w-full">
                     {isPending ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
