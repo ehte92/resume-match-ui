@@ -37,7 +37,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     },
     editorProps: {
       attributes: {
-        class: 'prose max-w-none focus:outline-none min-h-[400px] p-4',
+        class: 'prose max-w-none focus:outline-none min-h-[300px] sm:min-h-[400px] p-3 sm:p-4',
       },
     },
   });
@@ -62,11 +62,11 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       onClick={onClick}
       title={title}
       className={`
-        p-2 border-4 border-black transition-all
+        p-1.5 sm:p-2 border-2 border-black rounded transition-colors
         ${
           isActive
-            ? 'bg-yellow-400 shadow-none translate-x-1 translate-y-1'
-            : 'bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none'
+            ? 'bg-primary text-white'
+            : 'bg-white hover:bg-gray-50'
         }
       `}
     >
@@ -77,9 +77,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const charCount = editor.storage.characterCount?.characters() || editor.getText().length;
 
   return (
-    <div className={`border-4 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${className}`}>
+    <div className={`border-2 border-black bg-white shadow-md rounded ${className}`}>
       {/* Toolbar */}
-      <div className="flex items-center gap-2 p-2 border-b-4 border-black bg-gray-50">
+      <div className="flex items-center flex-wrap gap-1.5 sm:gap-2 p-2 sm:p-3 border-b-2 border-black bg-gray-50">
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBold().run()}
           isActive={editor.isActive('bold')}
@@ -124,7 +124,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
         <div className="flex-1" />
 
-        <div className="text-xs text-gray-600 font-mono bg-white border-2 border-black px-2 py-1">
+        <div className="text-[10px] sm:text-xs text-gray-600 font-mono bg-white border-2 border-black rounded px-2 py-1">
           {charCount} characters
         </div>
       </div>
@@ -133,7 +133,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       <EditorContent editor={editor} />
 
       {/* Keyboard Shortcuts Hint */}
-      <div className="px-4 py-2 border-t-4 border-black bg-gray-50 text-xs text-gray-600">
+      <div className="px-3 sm:px-4 py-2 border-t-2 border-black bg-gray-50 text-[10px] sm:text-xs text-gray-600">
         <span className="font-bold">Tips:</span> Use Cmd+B (bold), Cmd+I (italic), Cmd+U (underline) for quick
         formatting
       </div>
