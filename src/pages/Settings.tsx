@@ -115,18 +115,18 @@ export default function Settings() {
   };
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-8">
-      <h1 className="mb-8 font-head text-4xl font-bold">Settings</h1>
+    <div className="container mx-auto max-w-4xl px-3 sm:px-4 py-6 sm:py-8">
+      <h1 className="mb-4 sm:mb-6 lg:mb-8 text-2xl sm:text-3xl lg:text-4xl font-bold">Settings</h1>
 
       {/* Profile Settings Card */}
-      <div className="mb-8 overflow-hidden rounded-lg border-2 border-black shadow-[4px_4px_0_0_#000]">
-        <div className="bg-gradient-to-br from-primary to-primary-hover p-6">
-          <h2 className="font-head text-2xl font-bold text-white">Profile Settings</h2>
-          <p className="mt-1 text-sm text-white/90">Update your personal information</p>
+      <div className="mb-4 sm:mb-6 lg:mb-8 overflow-hidden rounded border-2 border-black shadow-md">
+        <div className="bg-gradient-to-br from-primary to-primary-hover p-4 sm:p-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-white">Profile Settings</h2>
+          <p className="mt-1 text-xs sm:text-sm text-white/90">Update your personal information</p>
         </div>
 
-        <div className="bg-white p-6">
-          <form onSubmit={handleUpdateProfile} className="space-y-4">
+        <div className="bg-white p-4 sm:p-6">
+          <form onSubmit={handleUpdateProfile} className="space-y-3 sm:space-y-4">
             <div>
               <Label htmlFor="fullName">Full Name</Label>
               <Input
@@ -151,17 +151,17 @@ export default function Settings() {
               />
             </div>
 
-            <div className="flex justify-end">
-              <Button type="submit" disabled={isUpdatingProfile} className="gap-2">
+            <div className="flex justify-end pt-2">
+              <Button type="submit" disabled={isUpdatingProfile} className="gap-2 text-sm">
                 {isUpdatingProfile ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Updating...
+                    <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" />
+                    <span className="text-xs sm:text-sm">Updating...</span>
                   </>
                 ) : (
                   <>
-                    <Save className="h-4 w-4" />
-                    Save Changes
+                    <Save className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <span className="text-xs sm:text-sm">Save Changes</span>
                   </>
                 )}
               </Button>
@@ -171,14 +171,14 @@ export default function Settings() {
       </div>
 
       {/* Password Change Card */}
-      <div className="mb-8 overflow-hidden rounded-lg border-2 border-black shadow-[4px_4px_0_0_#000]">
-        <div className="bg-gradient-to-br from-secondary to-secondary/90 p-6">
-          <h2 className="font-head text-2xl font-bold text-white">Change Password</h2>
-          <p className="mt-1 text-sm text-white/90">Update your account password</p>
+      <div className="mb-4 sm:mb-6 lg:mb-8 overflow-hidden rounded border-2 border-black shadow-md">
+        <div className="bg-gradient-to-br from-secondary to-secondary/90 p-4 sm:p-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-white">Change Password</h2>
+          <p className="mt-1 text-xs sm:text-sm text-white/90">Update your account password</p>
         </div>
 
-        <div className="bg-white p-6">
-          <form onSubmit={handleChangePassword} className="space-y-4">
+        <div className="bg-white p-4 sm:p-6">
+          <form onSubmit={handleChangePassword} className="space-y-3 sm:space-y-4">
             <div>
               <Label htmlFor="oldPassword">Current Password</Label>
               <Input
@@ -203,20 +203,20 @@ export default function Settings() {
                 disabled={isChangingPassword}
                 required
               />
-              <p className="mt-1 text-xs text-gray-600">Minimum 8 characters required</p>
+              <p className="mt-1 text-[10px] sm:text-xs text-gray-600">Minimum 8 characters required</p>
             </div>
 
-            <div className="flex justify-end">
-              <Button type="submit" variant="secondary" disabled={isChangingPassword} className="gap-2">
+            <div className="flex justify-end pt-2">
+              <Button type="submit" variant="secondary" disabled={isChangingPassword} className="gap-2 text-sm">
                 {isChangingPassword ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Changing...
+                    <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" />
+                    <span className="text-xs sm:text-sm">Changing...</span>
                   </>
                 ) : (
                   <>
-                    <Lock className="h-4 w-4" />
-                    Change Password
+                    <Lock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <span className="text-xs sm:text-sm">Change Password</span>
                   </>
                 )}
               </Button>
@@ -226,16 +226,16 @@ export default function Settings() {
       </div>
 
       {/* Danger Zone - Delete Account */}
-      <div className="overflow-hidden rounded-lg border-2 border-red-600 shadow-[4px_4px_0_0_#dc2626]">
-        <div className="bg-gradient-to-br from-red-500 to-red-600 p-6">
-          <h2 className="font-head text-2xl font-bold text-white">Danger Zone</h2>
-          <p className="mt-1 text-sm text-white/90">Permanently delete your account</p>
+      <div className="overflow-hidden rounded border-2 border-red-600 shadow-md">
+        <div className="bg-gradient-to-br from-red-500 to-red-600 p-4 sm:p-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-white">Danger Zone</h2>
+          <p className="mt-1 text-xs sm:text-sm text-white/90">Permanently delete your account</p>
         </div>
 
-        <div className="bg-white p-6">
-          <div className="mb-4 flex items-start gap-3 rounded-lg border-2 border-yellow-400 bg-yellow-50 p-4">
-            <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-600" />
-            <div className="text-sm">
+        <div className="bg-white p-4 sm:p-6">
+          <div className="mb-4 flex items-start gap-2 sm:gap-3 rounded border-2 border-yellow-400 bg-yellow-50 p-3 sm:p-4">
+            <AlertTriangle className="mt-0.5 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 text-yellow-600" />
+            <div className="text-xs sm:text-sm">
               <p className="font-semibold text-yellow-900">Warning: This action is irreversible!</p>
               <p className="mt-1 text-yellow-800">
                 Deleting your account will permanently remove all your data, including resumes and
@@ -244,7 +244,7 @@ export default function Settings() {
             </div>
           </div>
 
-          <form onSubmit={handleDeleteAccount} className="space-y-4">
+          <form onSubmit={handleDeleteAccount} className="space-y-3 sm:space-y-4">
             <div>
               <Label htmlFor="deletePassword">Password</Label>
               <Input
@@ -273,21 +273,21 @@ export default function Settings() {
               />
             </div>
 
-            <div className="flex justify-end">
+            <div className="flex justify-end pt-2">
               <Button
                 type="submit"
                 disabled={isDeletingAccount}
-                className="gap-2 border-red-600 bg-red-500 text-white hover:bg-red-600"
+                className="gap-2 border-red-600 bg-red-500 text-white hover:bg-red-600 text-sm"
               >
                 {isDeletingAccount ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Deleting...
+                    <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" />
+                    <span className="text-xs sm:text-sm">Deleting...</span>
                   </>
                 ) : (
                   <>
-                    <Trash2 className="h-4 w-4" />
-                    Delete Account
+                    <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <span className="text-xs sm:text-sm">Delete Account</span>
                   </>
                 )}
               </Button>
