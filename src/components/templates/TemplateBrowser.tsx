@@ -55,43 +55,43 @@ export default function TemplateBrowser({ onSelectTemplate, selectedTemplateId }
   const hasActiveFilters = searchQuery || selectedCategory || selectedTone !== null || templateType !== null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-black">Browse Templates</h2>
+      <div className="space-y-3 sm:space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h2 className="text-xl sm:text-2xl font-bold">Browse Templates</h2>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-4 py-2 bg-white border-4 border-black font-bold hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+            className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white border-2 border-black font-bold hover:bg-gray-50 transition-colors shadow-md text-sm"
           >
-            <Filter className="w-4 h-4" />
+            <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             {showFilters ? 'Hide Filters' : 'Show Filters'}
           </button>
         </div>
 
         {/* Search Bar */}
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
           <input
             type="text"
             placeholder="Search templates..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 border-4 border-black font-bold focus:outline-none focus:translate-x-1 focus:translate-y-1 focus:shadow-none transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+            className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-2 sm:py-3 border-2 border-black font-bold focus:outline-none focus:border-primary transition-colors shadow-md text-sm"
           />
         </div>
 
         {/* Filters Panel */}
         {showFilters && (
-          <div className="p-6 bg-yellow-100 border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="p-3 sm:p-4 bg-background border-2 border-black shadow-md rounded">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {/* Category Filter */}
               <div>
-                <label className="block text-sm font-black mb-2">Category</label>
+                <label className="block text-xs sm:text-sm font-bold mb-2">Category</label>
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full px-4 py-2 border-4 border-black font-bold focus:outline-none"
+                  className="w-full px-3 py-2 border-2 border-black font-bold focus:outline-none focus:border-primary transition-colors text-sm"
                 >
                   <option value="">All Categories</option>
                   {categories.map((category) => (
@@ -104,11 +104,11 @@ export default function TemplateBrowser({ onSelectTemplate, selectedTemplateId }
 
               {/* Tone Filter */}
               <div>
-                <label className="block text-sm font-black mb-2">Tone</label>
+                <label className="block text-xs sm:text-sm font-bold mb-2">Tone</label>
                 <select
                   value={selectedTone || ''}
                   onChange={(e) => setSelectedTone(e.target.value || null)}
-                  className="w-full px-4 py-2 border-4 border-black font-bold focus:outline-none"
+                  className="w-full px-3 py-2 border-2 border-black font-bold focus:outline-none focus:border-primary transition-colors text-sm"
                 >
                   <option value="">All Tones</option>
                   <option value="professional">Professional</option>
@@ -119,11 +119,11 @@ export default function TemplateBrowser({ onSelectTemplate, selectedTemplateId }
 
               {/* Template Type Filter */}
               <div>
-                <label className="block text-sm font-black mb-2">Template Type</label>
+                <label className="block text-xs sm:text-sm font-bold mb-2">Template Type</label>
                 <select
                   value={templateType === null ? '' : templateType.toString()}
                   onChange={(e) => setTemplateType(e.target.value === '' ? null : e.target.value === 'true')}
-                  className="w-full px-4 py-2 border-4 border-black font-bold focus:outline-none"
+                  className="w-full px-3 py-2 border-2 border-black font-bold focus:outline-none focus:border-primary transition-colors text-sm"
                 >
                   <option value="">All Templates</option>
                   <option value="true">System Templates</option>
@@ -135,9 +135,9 @@ export default function TemplateBrowser({ onSelectTemplate, selectedTemplateId }
             {hasActiveFilters && (
               <button
                 onClick={clearFilters}
-                className="mt-4 flex items-center gap-2 px-4 py-2 bg-white border-4 border-black font-bold hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                className="mt-3 sm:mt-4 flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border-2 border-black font-bold hover:bg-gray-50 transition-colors shadow-md text-sm"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 Clear Filters
               </button>
             )}
@@ -147,17 +147,17 @@ export default function TemplateBrowser({ onSelectTemplate, selectedTemplateId }
 
       {/* Loading State */}
       {isLoading && (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-black border-t-transparent"></div>
-          <p className="mt-4 font-bold">Loading templates...</p>
+        <div className="text-center py-8 sm:py-12">
+          <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-4 border-black border-t-transparent"></div>
+          <p className="mt-3 sm:mt-4 font-bold text-sm sm:text-base">Loading templates...</p>
         </div>
       )}
 
       {/* Empty State */}
       {!isLoading && templates.length === 0 && (
-        <div className="text-center py-12 px-4 bg-gray-100 border-4 border-black">
-          <p className="text-xl font-black mb-2">No templates found</p>
-          <p className="text-gray-600 font-bold">
+        <div className="text-center py-8 sm:py-12 px-4 bg-gray-100 border-2 border-black rounded shadow-md">
+          <p className="text-lg sm:text-xl font-bold mb-2">No templates found</p>
+          <p className="text-gray-600 font-medium text-sm sm:text-base">
             {hasActiveFilters ? 'Try adjusting your filters' : 'No templates available yet'}
           </p>
         </div>
@@ -166,7 +166,7 @@ export default function TemplateBrowser({ onSelectTemplate, selectedTemplateId }
       {/* Templates Grid */}
       {!isLoading && templates.length > 0 && (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {templates.map((template) => (
               <TemplateCard
                 key={template.id}
@@ -179,21 +179,21 @@ export default function TemplateBrowser({ onSelectTemplate, selectedTemplateId }
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-4 pt-6">
+            <div className="flex items-center justify-center gap-3 sm:gap-4 pt-4 sm:pt-6">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-6 py-2 bg-white border-4 border-black font-bold hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 sm:px-6 py-2 bg-white border-2 border-black font-bold hover:bg-gray-50 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               >
                 Previous
               </button>
-              <span className="font-bold">
+              <span className="font-bold text-sm sm:text-base">
                 Page {page} of {totalPages}
               </span>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="px-6 py-2 bg-white border-4 border-black font-bold hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 sm:px-6 py-2 bg-white border-2 border-black font-bold hover:bg-gray-50 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               >
                 Next
               </button>
@@ -240,42 +240,42 @@ function TemplateCard({ template, isSelected, onSelect }: TemplateCardProps) {
 
   return (
     <div
-      className={`p-6 bg-white border-4 border-black cursor-pointer transition-all ${
+      className={`p-3 sm:p-4 bg-white border-2 border-black cursor-pointer transition-all shadow-md hover:shadow-lg rounded ${
         isSelected
-          ? 'bg-green-100 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] translate-x-1 translate-y-1'
-          : 'shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none'
+          ? 'bg-green-50 ring-2 ring-primary'
+          : ''
       }`}
       onClick={onSelect}
     >
       {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
-          <h3 className="text-lg font-black mb-1">{template.name}</h3>
-          <p className="text-sm font-bold text-gray-600">{template.category}</p>
+      <div className="flex items-start justify-between mb-2 sm:mb-3">
+        <div className="flex-1 min-w-0">
+          <h3 className="text-base sm:text-lg font-bold mb-0.5 sm:mb-1 line-clamp-2">{template.name}</h3>
+          <p className="text-xs sm:text-sm font-medium text-gray-600">{template.category}</p>
         </div>
         {template.is_system ? (
-          <Sparkles className="w-5 h-5 text-yellow-600 flex-shrink-0" />
+          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600 flex-shrink-0 ml-2" />
         ) : (
-          <User className="w-5 h-5 text-blue-600 flex-shrink-0" />
+          <User className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0 ml-2" />
         )}
       </div>
 
       {/* Description */}
       {template.description && (
-        <p className="text-sm text-gray-700 mb-4 line-clamp-2">{template.description}</p>
+        <p className="text-xs sm:text-sm text-gray-700 mb-2 sm:mb-3 line-clamp-2">{template.description}</p>
       )}
 
       {/* Badges */}
-      <div className="flex flex-wrap gap-2 mb-4">
+      <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2 sm:mb-3">
         <span
-          className={`px-3 py-1 text-xs font-black border-2 border-black ${getToneBadgeColor(
+          className={`px-2 sm:px-3 py-0.5 sm:py-1 text-xs font-bold border-2 border-black rounded ${getToneBadgeColor(
             template.tone
           )}`}
         >
           {template.tone}
         </span>
         <span
-          className={`px-3 py-1 text-xs font-black border-2 border-black ${getLengthBadgeColor(
+          className={`px-2 sm:px-3 py-0.5 sm:py-1 text-xs font-bold border-2 border-black rounded ${getLengthBadgeColor(
             template.length
           )}`}
         >
@@ -284,14 +284,17 @@ function TemplateCard({ template, isSelected, onSelect }: TemplateCardProps) {
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between text-xs text-gray-500 font-bold">
+      <div className="flex items-center justify-between text-[10px] sm:text-xs text-gray-500 font-medium">
         <span>{template.is_system ? 'System Template' : 'My Template'}</span>
-        <span>Used {template.usage_count} times</span>
+        <span>Used {template.usage_count}x</span>
       </div>
 
       {isSelected && (
-        <div className="mt-4 pt-4 border-t-2 border-black">
-          <p className="text-sm font-black text-green-700">✓ Selected</p>
+        <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t-2 border-primary">
+          <p className="text-xs sm:text-sm font-bold text-primary flex items-center gap-1">
+            <span className="inline-block w-4 h-4 bg-primary rounded-full flex items-center justify-center text-white text-[10px]">✓</span>
+            Selected
+          </p>
         </div>
       )}
     </div>
