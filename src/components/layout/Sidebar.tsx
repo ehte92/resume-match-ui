@@ -1,33 +1,27 @@
-import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router';
 import {
   LayoutDashboard,
   PlusCircle,
   FolderOpen,
   FileText,
-  User,
-  Settings,
   LogOut,
-  ChevronLeft,
-  ChevronRight,
   X,
-  Menu,
+  Sparkles,
+  Settings,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { Tooltip } from '@/components/retroui/Tooltip';
 
 interface NavItem {
   id: string;
   label: string;
   icon: React.ReactNode;
   path: string;
-  isPrimary?: boolean;
 }
 
 interface SidebarProps {
-  isCollapsed: boolean;
-  onToggleCollapse: () => void;
   isMobileOpen?: boolean;
   onMobileClose?: () => void;
 }
@@ -44,7 +38,6 @@ const navItems: NavItem[] = [
     label: 'New Analysis',
     icon: <PlusCircle className="h-5 w-5" />,
     path: '/new-analysis',
-    isPrimary: true,
   },
   {
     id: 'resumes',
@@ -61,15 +54,12 @@ const navItems: NavItem[] = [
 ];
 
 export const Sidebar = ({
-  isCollapsed,
-  onToggleCollapse,
   isMobileOpen = false,
   onMobileClose,
 }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const handleNavigation = (path: string) => {
     navigate(path);
@@ -114,208 +104,184 @@ export const Sidebar = ({
       )}
 
       {/* Sidebar */}
-      <aside
-        className={cn(
-          'fixed top-0 left-0 h-full bg-white z-50 flex flex-col transition-all duration-300',
-          // Neobrutalism: Bold right border with sharp shadow
-          'border-r-2 border-black',
-          'shadow-[4px_0_0_0_#000000]',
-          isCollapsed ? 'w-20' : 'w-60',
-          // Mobile: slide in from left
-          'lg:translate-x-0',
-          isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        )}
-      >
-        {/* Logo Section - Minimal */}
-        <div className={cn(
-          'flex items-center h-16 px-4 border-b-2 border-black',
-          isCollapsed ? 'justify-center' : 'justify-between'
-        )}>
-          {!isCollapsed ? (
-            <>
-              <h1 className="font-display text-xl font-bold text-foreground">
-                ResumeMatch
-              </h1>
-              {/* Mobile Close Button */}
+      <Tooltip.Provider delayDuration={300}>
+        <aside
+          className={cn(
+            'fixed top-0 left-0 h-full bg-white z-50 flex flex-col',
+            'border-r-2 border-black',
+            // Desktop: collapsed (w-20), Mobile: fullscreen (w-full)
+            'w-full lg:w-20',
+            // Mobile: slide in from left
+            'transition-transform duration-300 ease-in-out',
+            'lg:translate-x-0',
+            isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          )}
+        >
+          {/* Logo Section - Desktop Only */}
+          <div className="hidden lg:flex items-center justify-center h-16 px-4 border-b-2 border-black">
+            <Sparkles className="h-8 w-8 text-primary" />
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 py-6 px-3 overflow-y-auto">
+            {/* Mobile Close Button */}
+            <div className="lg:hidden flex justify-end mb-4 px-1">
               <button
                 onClick={onMobileClose}
-                className="lg:hidden p-1 hover:bg-background rounded transition-colors"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 aria-label="Close menu"
               >
                 <X className="h-5 w-5" />
               </button>
-            </>
-          ) : (
-            <div className="font-display text-2xl font-bold text-primary">R</div>
-          )}
-        </div>
+            </div>
 
-        {/* Navigation - Minimal with whitespace */}
-        <nav className="flex-1 py-6 px-3 overflow-y-auto">
-          <ul className="space-y-2">
-            {navItems.map((item) => {
-              const active = isActive(item.path);
-              return (
-                <li key={item.id}>
-                  <button
-                    onClick={() => handleNavigation(item.path)}
-                    className={cn(
-                      'w-full flex items-center gap-3 px-4 py-3 transition-all duration-200',
-                      // Minimal: No borders on default, only active state
-                      'border-2',
-                      isCollapsed && 'justify-center',
-                      // Active state: Bold left border
-                      active
-                        ? 'border-l-4 border-y-0 border-r-0 border-primary bg-gray-50'
-                        : 'border-transparent',
-                      // Primary CTA: Yellow background with neobrutalism
-                      item.isPrimary && !active
-                        ? 'bg-secondary border-black shadow-[3px_3px_0_0_#000] hover:translate-y-[2px] hover:shadow-[1px_1px_0_0_#000]'
-                        : !active && 'hover:bg-gray-50'
-                    )}
-                    aria-label={item.label}
-                    title={isCollapsed ? item.label : undefined}
-                  >
-                    <span className={cn(
-                      'flex-shrink-0',
-                      active ? 'text-primary' : item.isPrimary ? 'text-foreground' : 'text-muted-foreground'
-                    )}>
-                      {item.icon}
-                    </span>
-                    {!isCollapsed && (
-                      <span className={cn(
-                        'text-sm font-medium',
-                        active ? 'text-primary' : 'text-foreground'
-                      )}>
+            <ul className="space-y-1">
+              {navItems.map((item) => {
+                const active = isActive(item.path);
+                return (
+                  <li key={item.id}>
+                    {/* Desktop: Show tooltip */}
+                    <Tooltip>
+                      <Tooltip.Trigger asChild>
+                        <button
+                          onClick={() => handleNavigation(item.path)}
+                          className={cn(
+                            'w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all',
+                            // Desktop: center icons
+                            'lg:justify-center',
+                            active
+                              ? 'bg-primary/10 text-primary border-l-4 border-primary'
+                              : 'text-gray-700 hover:bg-gray-100'
+                          )}
+                          aria-label={item.label}
+                        >
+                          <span className="flex-shrink-0">
+                            {item.icon}
+                          </span>
+                          {/* Mobile: show label */}
+                          <span className="text-sm font-medium lg:hidden">
+                            {item.label}
+                          </span>
+                        </button>
+                      </Tooltip.Trigger>
+                      {/* Only show tooltip on desktop */}
+                      <Tooltip.Content
+                        side="right"
+                        className="hidden lg:block"
+                        variant="solid"
+                      >
                         {item.label}
-                      </span>
+                      </Tooltip.Content>
+                    </Tooltip>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+
+          {/* User Section */}
+          <div className="border-t-2 border-black p-4">
+            {/* Desktop: Avatar, Settings, Logout with tooltips */}
+            <div className="hidden lg:flex flex-col items-center space-y-3">
+              {/* Avatar */}
+              <Tooltip>
+                <Tooltip.Trigger asChild>
+                  <div className="h-10 w-10 rounded-full bg-primary border-2 border-black flex items-center justify-center cursor-pointer">
+                    <span className="text-white text-sm font-bold">
+                      {getUserInitials()}
+                    </span>
+                  </div>
+                </Tooltip.Trigger>
+                <Tooltip.Content side="right" variant="solid">
+                  <div className="text-xs">
+                    <div className="font-medium">{user?.full_name || 'User'}</div>
+                    <div className="text-gray-300">{user?.email}</div>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip>
+
+              {/* Settings */}
+              <Tooltip>
+                <Tooltip.Trigger asChild>
+                  <button
+                    onClick={() => handleNavigation('/settings')}
+                    className={cn(
+                      'p-2 rounded-lg transition-colors',
+                      isActive('/settings')
+                        ? 'bg-primary/10 text-primary'
+                        : 'text-gray-700 hover:bg-gray-100'
                     )}
+                    aria-label="Settings"
+                  >
+                    <Settings className="h-5 w-5" />
                   </button>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
+                </Tooltip.Trigger>
+                <Tooltip.Content side="right" variant="solid">
+                  Settings
+                </Tooltip.Content>
+              </Tooltip>
 
-        {/* User Section - Minimal at bottom */}
-        <div className="border-t-2 border-black">
-          {/* User Info Button */}
-          <button
-            onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-            className={cn(
-              'w-full flex items-center gap-3 px-4 py-4 hover:bg-gray-50 transition-colors',
-              isCollapsed && 'justify-center'
-            )}
-            aria-label="User menu"
-          >
-            {/* Avatar Circle */}
-            <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary border-2 border-black flex items-center justify-center shadow-sm">
-              <span className="text-white text-sm font-bold">
-                {getUserInitials()}
-              </span>
+              {/* Logout */}
+              <Tooltip>
+                <Tooltip.Trigger asChild>
+                  <button
+                    onClick={handleLogout}
+                    className="p-2 hover:bg-red-50 hover:text-red-600 text-gray-700 rounded-lg transition-colors"
+                    aria-label="Logout"
+                  >
+                    <LogOut className="h-5 w-5" />
+                  </button>
+                </Tooltip.Trigger>
+                <Tooltip.Content side="right" variant="solid">
+                  Logout
+                </Tooltip.Content>
+              </Tooltip>
             </div>
-            {!isCollapsed && (
-              <div className="flex-1 text-left">
-                <p className="text-sm font-medium text-foreground truncate">
-                  {user?.full_name || 'User'}
-                </p>
-                <p className="text-xs text-muted-foreground truncate">
-                  {user?.email}
-                </p>
-              </div>
-            )}
-          </button>
 
-          {/* User Menu Dropdown */}
-          {isUserMenuOpen && !isCollapsed && (
-            <div className="border-t-2 border-black bg-gray-50">
+            {/* Mobile: Full user section */}
+            <div className="lg:hidden space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary border-2 border-black flex items-center justify-center">
+                  <span className="text-white text-sm font-bold">
+                    {getUserInitials()}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {user?.full_name || 'User'}
+                  </p>
+                  <p className="text-xs text-gray-600 truncate">
+                    {user?.email}
+                  </p>
+                </div>
+              </div>
+
+              {/* Settings Button */}
               <button
-                onClick={() => {
-                  navigate('/settings');
-                  setIsUserMenuOpen(false);
-                  if (onMobileClose) onMobileClose();
-                }}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-background transition-colors"
+                onClick={() => handleNavigation('/settings')}
+                className={cn(
+                  'w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors border border-gray-300',
+                  isActive('/settings')
+                    ? 'bg-primary/10 text-primary border-primary'
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                )}
               >
-                <Settings className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">Settings</span>
+                <Settings className="h-4 w-4" />
+                <span className="text-sm font-medium">Settings</span>
               </button>
+
+              {/* Logout Button */}
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-destructive hover:text-white transition-colors border-t border-gray-200"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 hover:bg-red-50 hover:text-red-600 text-gray-700 rounded-lg transition-colors border border-gray-300"
               >
                 <LogOut className="h-4 w-4" />
-                <span className="text-sm">Logout</span>
+                <span className="text-sm font-medium">Logout</span>
               </button>
             </div>
-          )}
-
-          {/* Collapsed user menu */}
-          {isUserMenuOpen && isCollapsed && (
-            <div className="absolute bottom-16 left-20 bg-white border-2 border-black shadow-lg rounded overflow-hidden min-w-[200px]">
-              <div className="px-4 py-3 border-b-2 border-black bg-gray-50">
-                <p className="text-sm font-medium text-foreground truncate">
-                  {user?.full_name || 'User'}
-                </p>
-                <p className="text-xs text-muted-foreground truncate">
-                  {user?.email}
-                </p>
-              </div>
-              <button
-                onClick={() => {
-                  navigate('/settings');
-                  setIsUserMenuOpen(false);
-                  if (onMobileClose) onMobileClose();
-                }}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-background transition-colors"
-              >
-                <Settings className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">Settings</span>
-              </button>
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-destructive hover:text-white transition-colors border-t border-gray-200"
-              >
-                <LogOut className="h-4 w-4" />
-                <span className="text-sm">Logout</span>
-              </button>
-            </div>
-          )}
-
-          {/* Collapse Toggle - Desktop Only */}
-          <button
-            onClick={onToggleCollapse}
-            className={cn(
-              'hidden lg:flex w-full items-center gap-3 px-4 py-3 border-t-2 border-black hover:bg-gray-50 transition-colors',
-              isCollapsed && 'justify-center'
-            )}
-            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            <span className="flex-shrink-0">
-              {isCollapsed ? (
-                <ChevronRight className="h-4 w-4" />
-              ) : (
-                <ChevronLeft className="h-4 w-4" />
-              )}
-            </span>
-            {!isCollapsed && (
-              <span className="text-sm text-muted-foreground">Collapse</span>
-            )}
-          </button>
-        </div>
-      </aside>
-
-      {/* Floating Mobile Menu Button */}
-      {!isMobileOpen && (
-        <button
-          onClick={onMobileClose ? () => {} : undefined}
-          className="lg:hidden fixed bottom-6 right-6 h-14 w-14 bg-primary text-white border-2 border-black shadow-[4px_4px_0_0_#000] hover:translate-y-1 hover:shadow-[2px_2px_0_0_#000] rounded-full flex items-center justify-center z-40 transition-all"
-          aria-label="Open menu"
-          style={{ display: 'none' }} // Hidden for now, can be enabled if needed
-        >
-          <Menu className="h-6 w-6" />
-        </button>
-      )}
+          </div>
+        </aside>
+      </Tooltip.Provider>
     </>
   );
 };
